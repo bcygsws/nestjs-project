@@ -14,24 +14,31 @@
  *
  */
 
-class A {
-	name: string;
-	// A类由无参构造函数改成有参构造函数时，
-	// constructor() {
-	constructor(name: string) {
-		this.name = name;
-	}
-}
-
-class B {
-	b: any;
-	constructor() {
-		this.b = new A().name; // 要随着A类的修改而修改
-	}
-}
-class C {
-	c: any;
-	constructor() {
-		this.c = new A().name; // 要随着A类的修改而修改
-	}
-}
+// class A {
+//     name: string;
+//     // A类由无参构造函数改成有参构造函数时，
+//
+//     // constructor() {
+//     // 	this.name = "小满";
+//     // }
+//
+//     constructor(name: string) {
+//         this.name = name;
+//     }
+// }
+//
+// class B {
+//     b: any;
+//
+//     constructor() {
+//         this.b = new A().name; // 要随着A类的修改而修改
+//     }
+// }
+//
+// class C {
+//     c: any;
+//
+//     constructor() {
+//         this.c = new A().name; // 要随着A类的修改而修改
+//     }
+// }
