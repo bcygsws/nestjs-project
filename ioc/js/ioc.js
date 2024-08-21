@@ -13,7 +13,6 @@
  * 将A类中的this.name的具体赋值，改写成this.name=name后，在B类和C类中的实例创建语句都要修改
  *
  */
-
 // class A {
 //     name: string;
 //     // A类由无参构造函数改成有参构造函数时，
