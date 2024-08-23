@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 /**
- * 注：当将webpack.config.js配置文件从根目录下，移动至build文件夹时，当前配置文件路径下降了一级；相应的涉及
+ * 注：当将webpack.config_module.js配置文件从根目录下，移动至build文件夹时，当前配置文件路径下降了一级；相应的涉及
  * 其他文件夹的路径，要升一级；例如：path.resolve(__dirname,'../src/index.ts')
  *
  * */

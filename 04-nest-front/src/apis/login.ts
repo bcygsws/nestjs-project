@@ -3,7 +3,7 @@ import $http from "@/utils/http";
 
 
 // 1.获取验证码API
-// 在vite.config.ts文件中配置代理
+// 在vite.config_module.ts文件中配置代理
 
 // const getCaptchaAPI = () => {
 //     return $http.request<ResType<any>>({

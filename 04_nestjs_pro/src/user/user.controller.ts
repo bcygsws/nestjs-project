@@ -10,11 +10,12 @@ import {
     Request,
     Query,
     Headers,
-    HttpCode
+    HttpCode, Inject
 } from '@nestjs/common';
 import {UserService} from './user.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
+import {UserService2} from "./user.service2";
 
 // 版本控制
 // 1.整体版本控制@Controller({path:'user',version:'1'})
@@ -27,7 +28,48 @@ import {UpdateUserDto} from './dto/update-user.dto';
 //     version: '1'
 // })
 export class UserController {
-    constructor(private readonly userService: UserService) {
+    constructor(@Inject('SER') private readonly userService: UserService,
+                @Inject('TEST') private readonly shop: string[],
+                @Inject('FACTORY') private readonly num: number,
+                @Inject('ASYNC') private readonly str: string,
+                @Inject('CONFIG') private readonly obj: Object,
+                @Inject('DYNAMIC') private readonly url: Object) {
+    }
+
+    // 访问：localhost:3000/user/hi
+    // 测试：值提供者TEST，这个数组可以拿到
+    @Get('hi')
+    findHi() {
+        return this.shop;// 在上述url中，访问到了 ["TB","JD","PDD"]
+    }
+
+    // 访问：localhost:3000/user/num
+    // 测试：值提供者FACTORY，这个num可以拿到
+    @Get('num')
+    findNum() {
+        return this.num;// 拿到了工厂模式值，123
+    }
+
+    // 访问：localhost:3000/user/async
+    // 测试：值提供者ASYNC，这个str可以拿到
+    @Get('async')
+    findAsync() {
+        return this.str;// 拿到异步提供者的值
+    }
+
+    // 获取全局模块CONFIG中提供的对象{baseUrl:''}
+    // 访问：localhost:3000/user/obj
+    // 能在路由下拿到对象 {"baseUrl":"/api"}
+    @Get('obj')
+    findObj() {
+        return this.obj;
+    }
+
+    // 获取动态模块中的路径
+    // 访问：localhost:3000/user/dyn
+    @Get('dyn')
+    findDyn() {
+        return this.url;
     }
 
     // 1.get请求，query参数

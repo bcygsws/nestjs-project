@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, Session} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, Session, Inject} from '@nestjs/common';
 import {LoginService} from './login.service';
 import {CreateLoginDto} from './dto/create-login.dto';
 import {UpdateLoginDto} from './dto/update-login.dto';
@@ -17,8 +17,9 @@ import * as svgCaptcha from 'svg-captcha';
  * */
 @Controller('login')
 export class LoginController {
-    constructor(private readonly loginService: LoginService) {
+    constructor(@Inject('ABC') private readonly loginService: LoginService) {
     }
+
 
     // 1.get方式:每次进入登录界面，请求一个验证码
     // 请求url：http://localhost:3000/login/code
@@ -34,8 +35,11 @@ export class LoginController {
             size: 4, // 验证码有几位字符
             fontSize: 50, // 字符大小
             width: 100, // 宽度
-            height: 30, // 高度
-            background: '#cc9966' // 背景颜色
+            height: 35, // 高度
+            background: '#f1f5f8', // 背景颜色
+            noise: Math.floor(Math.random() * 3),// 干扰线条数，0，1,2条
+            color: true,// 设置验证码字符有颜色
+            ignoreChars: '0oli' // 忽略容易混淆的字符
 
         });
         console.log(captcha);// captcha对象：{text:'xFjM',data:'<svg xmlns="">'}
