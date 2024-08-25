@@ -5,8 +5,11 @@
 -->
 <template>
   主页面板
+  <stream-image></stream-image>
 </template>
 <script lang="ts" setup>
+import StreamImage from '@/components/StreamImage.vue';
+
 
 </script>
 

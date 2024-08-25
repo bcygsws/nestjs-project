@@ -10,7 +10,7 @@ import {
     Request,
     Query,
     Headers,
-    HttpCode, Inject
+    HttpCode, Inject, Req, Res
 } from '@nestjs/common';
 import {UserService} from './user.service';
 import {CreateUserDto} from './dto/create-user.dto';
@@ -87,12 +87,12 @@ export class UserController {
     // }
 
     // 1.2 使用自带的@Query装饰器，获取路由参数
-    findUser(@Query() query) {
-        console.log(query);
-        return {
-            code: 200
-        }
-    }
+    // findUser(@Query() query) {
+    //     console.log(query);
+    //     return {
+    //         code: 200
+    //     }
+    // }
 
     // @Post()
     // createUser(@Body() body) {
@@ -102,8 +102,21 @@ export class UserController {
     //     }
     // }
 
+    // get请求
+    // 访问：localhost:3000/user
+    @Get()
+    findAll(@Res() res) {
+       res.send({
+           code:200,
+           message:"请求成功了，兄弟们"
+       })
+    }
+
     // 为@Body装饰器传参，直接拿到这个路由参数
     // @HttpCode()控制接口返回的状态码 @HttpCode(500)，因为return返回的是200，请求就会出错
+
+    // POST请求
+    // 访问：localhost:3000/user
     @Post()
     // @HttpCode(500)
     createUser(@Body('name') name: string, @Headers() header: string) {
@@ -111,20 +124,17 @@ export class UserController {
         console.log(header);
         console.log(header['cookie']);
         return {
-            code: 200
+            code: 200,
+            message: 'post请求成功',
+            data: name
         }
     }
 
-    @Post()
-    create(@Body() createUserDto: CreateUserDto) {
-        return this.userService.create(createUserDto);
-    }
+    // @Post()
+    // create(@Body() createUserDto: CreateUserDto) {
+    //     return this.userService.create(createUserDto);
+    // }
 
-
-    @Get()
-    findAll() {
-        return this.userService.findAll();
-    }
 
     // @Version('1')
     @Get(':id')

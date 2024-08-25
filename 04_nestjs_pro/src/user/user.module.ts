@@ -1,7 +1,9 @@
-import {Module} from '@nestjs/common';
+import {MiddlewareConsumer, Module, NestModule, RequestMethod} from '@nestjs/common';
 import {UserService} from './user.service';
 import {UserController} from './user.controller';
 import {UserService2} from "./user.service2";
+import * as console from "console";
+import {Logger} from "../middleware";
 
 @Module({
     controllers: [UserController],
@@ -43,5 +45,34 @@ import {UserService2} from "./user.service2";
     ],
     exports: ['SER'] // 若在app.controller中访问当前user模块中的service方法，需要在此处导出这个service方法，使其成为其他模块能够消费的类
 })
-export class UserModule {
+export class UserModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        console.log(consumer);
+        /**
+         * @consumer消费对象
+         * 2.1 consumer调用定义的中间件类Logger,并设置需要拦截的路由
+         * 2.2 forRoutes()方法里可以传：
+         *
+         * a.路由字符串值
+         * b.对象值，path为键
+         * c.甚至把整个controller塞进去都可以，例如UserController
+         *
+         *
+         * */
+        // a.路由字符串值
+        // consumer.apply(Logger).forRoutes('/user/hi');
+
+        // forRoutes: for有支持的意思；
+        // forRoutes把路由和当前中间件关联起来;forRoutes中的路由，在规则白名单内，放行；在规则外，就被拦截
+
+        // b.path键对象
+        // localhost:3000/user GET,被拦截了  /user不在白名单，get方式，限定在forRoutes()参数里；执行路由被拦截的分支
+        // localhost:3000/user POST,放行了  /user不在白名单，post方式，也没有在forRoutes()中，这个路由没有消费中间件，能够通过
+        consumer.apply(Logger).forRoutes({ path:'user',method: RequestMethod.GET});
+
+        // c.传入controller对象
+        // consumer.apply(Logger).forRoutes(UserController);// 中间件use方法中的白名单路由生效，其余的user路由全部被拦截
+
+
+    }
 }
