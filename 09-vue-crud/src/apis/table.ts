@@ -32,7 +32,7 @@ const getPageListAPI = (val: IQuery) => {
     });
 }
 // 添加数据接口
-const addItemAPI = (val: User) => {
+const addItemAPI = (val: IUser) => {
     const {name, desc} = val;
     return $http.request({
         method: 'post',
@@ -44,7 +44,48 @@ const addItemAPI = (val: User) => {
     })
 
 }
+// 根据id值删除一条记录
+const delItemAPI = (id: number) => {
+    return $http.request({
+        method: 'delete',
+        url: `/user/${id}`
+    })
+}
+
+// 根据id,编辑一条记录后提交
+const editItemAPI = (val: IUser) => {
+    const {id, name, desc} = val;
+    return $http.request({
+        method: 'patch',
+        url: `/user/${id}`,
+        data: {
+            name,
+            desc
+        }
+    })
+}
+
+// 根据列表id,为每条记录添加若干个标签
+export interface ITag {
+    userId: number,
+    tags: string[]
+}
+
+const addTagsAPI = (val: ITag) => {
+    const {userId, tags} = val;
+    return $http.request({
+        method: 'post',
+        url: '/user/add/tags',
+        data: {
+            userId,
+            tags
+        }
+    })
+}
 export {
     getPageListAPI,
-    addItemAPI
+    addItemAPI,
+    delItemAPI,
+    editItemAPI,
+    addTagsAPI
 }
