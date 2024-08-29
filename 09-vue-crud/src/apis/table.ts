@@ -12,6 +12,7 @@ export interface IUser {
     id?: number
     name: string
     desc: string
+    label?:string
 }
 
 export interface IInfo {

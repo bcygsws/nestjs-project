@@ -6,9 +6,13 @@ import {User} from "./user.entity";
 export class Tags {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column()
+    @Column({nullable: true})
     tags: string;
-    @ManyToOne(() => User, user => user.tags)
+    @ManyToOne(
+        () => User,
+        user => user.tags,
+        {onDelete: 'CASCADE', onUpdate: 'CASCADE'}
+    )
     @JoinColumn()
     user: User;
 

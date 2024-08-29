@@ -35,9 +35,28 @@
       </div>
       <!--表格内容区-->
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column label="名字" prop="name"/>
-        <el-table-column label="描述" prop="desc"/>
-        <el-table-column label="ID" prop="id"/>
+        <el-table-column label="名字" align="center" prop="name"/>
+        <el-table-column label="描述" align="center" prop="desc"/>
+        <el-table-column label="ID" align="center" prop="id"/>
+        <el-table-column label="标签" align="center" prop="label">
+          <!--利用作用域插槽，某一列中嵌入其他标签-->
+          <template #default="scope">
+            <!--打印当前 行内容 ，就是scope.row -->
+            <!--{{ scope.row }}-->
+            <el-space>
+              <el-tag
+                  v-for="item in scope.row['label']"
+                  :key="item.id"
+                  class="mx-1"
+                  closable
+                  :disable-transitions="false"
+                  @close=""
+              >
+                {{ item['tags'] }}
+              </el-tag>
+            </el-space>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="操作">
           <template #default="scope">
             <el-button size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">
@@ -67,6 +86,7 @@
             background
             layout="prev, pager, next"
             :total="pageInfo.total"
+            :page-size="pageInfo.pageSize"
             :current-page="pageInfo.page"
             @update:current-page="switchPage"
             class="mt-4"
@@ -144,7 +164,8 @@ const pageInfo = reactive<IQuery>({
 let form = reactive<IUser>({
   id: 0,
   name: '',
-  desc: ''
+  desc: '',
+  label: ''
 });
 
 // tag标签数据
@@ -407,7 +428,7 @@ const handleTagSave = async () => {
   tagInput.tags = _.cloneDeep(tagsData)
       .filter((item: IItem) => tagVal.value.includes(item.value))
       .map(val => val.label) ?? [];
-  console.log("====",tagInput);
+  console.log("====", tagInput);
   // 提交到后端
   const res = await addTagsAPI(tagInput);
   console.log(res.data);

@@ -18,7 +18,7 @@ export class UserService {
      * 从controller文件中，获悉creatUserDto里存的就是body参数对象
      *
      * */
-    create(createUserDto: CreateUserDto) {
+    async create(createUserDto: CreateUserDto) {
         // 实例化User实体类
         // 保存数据到user对象，typeorm映射到数据库
         const data = new User();
@@ -47,18 +47,31 @@ export class UserService {
                 name: Like(`%${keywords}%`)
             }
         })
-
+        console.log("faaaw", list);
+        // if (!list['label']) {
+        //     list['label'] = [];
+        // } else {
+        //     list['label'] = JSON.parse(list['label'][0]);
+        // }
+        list.map(item => {
+                if (!item['label']) {
+                    item['label'] = JSON.parse('[]');
+                } else {
+                    item['label'] = JSON.parse(item['label']);
+                }
+            }
+        )
         return {
             list,
             total
-        };
+        }
     }
 
-    findOne(id: number) {
+    async findOne(id: number) {
         return `This action returns a #${id} user`;
     }
 
-    update(id: number, updateUserDto: UpdateUserDto) {
+    async update(id: number, updateUserDto: UpdateUserDto) {
         return this.user.update(id, updateUserDto);
     }
 
@@ -75,8 +88,23 @@ export class UserService {
             }
         });
         console.log("--", userInfo);
+        /**
+         *@name:灵活的createQueryBuilder方法
+         *@description:参考文档：https://typeorm.bootcss.com/select-query-builder
+         * 1.使用getConnection().createQueryBuilder().select(Tags)方法，已经废弃
+         * 2.getManager().createQueryBuilder(Tags,'tag_db')这两种方式已经废弃
+         *
+         * 3.getRepository(Tags).createQueryBuilder('tags')仍然保留
+         * 注：tags是别名
+         *
+         *
+         * */
+
         // 每次存取userId的tags时，先删除该userId下添加了所有记录行
-        // await this.tag_tb.delete();
+
+        await this.tag_tb.createQueryBuilder('tags').delete().where('tags.userId = :id', {
+            id: bodyInfo.userId
+        }).execute();
 
         // 2.将前端传过来的参数tags数组，存入tags表，同时根据useId组成数组
         const tagList: Tags[] = [];
@@ -92,6 +120,9 @@ export class UserService {
         }
         // 3.已经完成将多条tags表记录存入数据库，同时存入数组tagList,并添加到当前userInfo的tags键上
         userInfo.tags = tagList;
+        userInfo.label = JSON.stringify(tagList);
+        console.log("--->", userInfo.label);
+        console.log("--->", userInfo);
         // 将userInfo存入user表
         return this.user.save(userInfo);
     }
