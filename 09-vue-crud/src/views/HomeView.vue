@@ -50,7 +50,7 @@
                   class="mx-1"
                   closable
                   :disable-transitions="false"
-                  @close=""
+                  @close="closeTag(item.id,scope.row.id)"
               >
                 {{ item['tags'] }}
               </el-tag>
@@ -140,8 +140,18 @@
 <script lang="ts" setup>
 // 图片组件
 import {Search, Plus} from '@element-plus/icons-vue';
-import {onMounted, reactive, ref} from 'vue'
-import {addItemAPI, addTagsAPI, delItemAPI, editItemAPI, getPageListAPI, IQuery, ITag, IUser} from "@/apis/table";
+import {computed, onMounted, reactive, ref, watchEffect} from 'vue'
+import {
+  addItemAPI,
+  addTagsAPI,
+  delItemAPI,
+  delTagAPI,
+  editItemAPI,
+  getPageListAPI,
+  IQuery,
+  ITag,
+  IUser
+} from "@/apis/table";
 import {ElMessage, FormInstance} from 'element-plus';
 import _ from 'lodash';
 // 表单域ref对象
@@ -165,7 +175,7 @@ let form = reactive<IUser>({
   id: 0,
   name: '',
   desc: '',
-  label: ''
+  label: []
 });
 
 // tag标签数据
@@ -181,6 +191,8 @@ const resetForm = {
 };
 // 存储到请求列表
 const tableData = ref<IUser[]>([]);
+// 存储标签列表
+const tagList = ref<ITag[]>([]);
 /**
  * @description:对话框复用
  * 确定是添加数据还是修改数据？
@@ -222,7 +234,6 @@ const getPageList = async () => {
     tableData.value = res.data?.data?.list ?? [];
     // 存储总条数
     pageInfo.total = res.data?.data?.total;
-
   } else {
     // TODO: 提示错误信息
   }
@@ -447,6 +458,63 @@ const handleTagSave = async () => {
   }
 
 }
+/**
+ * @name:handleClose
+ * @description:删除标签，事件处理
+ *
+ * */
+const closeTag = async (tagId: number, userId: number) => {
+  console.log(tagId);
+  console.log(userId);
+  // 记录行id
+  tagInput.userId = userId;
+  const tag: IUser[] = tableData.value.filter(item => item.id === userId);
+  tagList.value = tag[0].label!;
+  tagList.value.some((val, index) => {
+    if (val.id === tagId) {
+      tagList.value.splice(index, 1);
+      return true;
+    }
+  })
+
+
+  const res = await delTagAPI(tagId);
+  console.log(res.data);
+  if (res.data.code === 200) {
+    // 1.提示信息
+    ElMessage({
+      showClose: true,
+      type: 'success',
+      message: '成功删除一个标签'
+    });
+    // 2.重新请求列表
+    await getPageList();
+  } else {
+    ElMessage({
+      showClose: true,
+      type: 'error',
+      message: '删除一个标签失败'
+    });
+  }
+
+}
+/**
+ * @name:watchEffect
+ * @description:
+ *
+ * */
+// watchEffect(() => {
+//   // 先从前端的tableData删除标签
+//   tableData.value.some(item => {
+//     if (item.id === tagInput.userId) {
+//       item.label = tagList.value;
+//       return true;
+//     }
+//   })
+//
+// })
+
+
 </script>
 
 <style lang="scss" scoped>

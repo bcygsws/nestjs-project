@@ -35,9 +35,15 @@ export class UserController {
         return this.userService.remove(+id);
     }
 
-    @Post('/add/tags')
+    @Post('tags')
     addTags(@Body() bodyInfo: { tags: string[], userId: number }) {
         console.log(bodyInfo)
         return this.userService.addTags(bodyInfo);
+    }
+
+    @Delete('tags/:id')
+    delTag(@Param('id') id: number) {
+        console.log(id);
+        return this.userService.delTag(id);
     }
 }

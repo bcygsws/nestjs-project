@@ -79,6 +79,12 @@ export class UserService {
         return this.user.delete(id);
     }
 
+    /**
+     * @name:addTags方法
+     * @description:将tags存入数据库，并添加到user表的标签中
+     *
+     * */
+
     async addTags(bodyInfo: { userId: number, tags: string[] }) {
         console.log(bodyInfo);
         // 1.根据id,在user表中，查出这条记录的信息
@@ -125,5 +131,16 @@ export class UserService {
         console.log("--->", userInfo);
         // 将userInfo存入user表
         return this.user.save(userInfo);
+    }
+
+    /**
+     * @name:delTag方法
+     * @description:根据tagId和userId，在tags表中删除记录
+     * 访问：localhost:3000/
+     *
+     * */
+    async delTag(tagId: number) {
+        await this.tag_tb.delete(tagId);
+
     }
 }

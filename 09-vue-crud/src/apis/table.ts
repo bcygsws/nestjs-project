@@ -12,7 +12,7 @@ export interface IUser {
     id?: number
     name: string
     desc: string
-    label?:string
+    label?: ITag[]
 }
 
 export interface IInfo {
@@ -69,24 +69,34 @@ const editItemAPI = (val: IUser) => {
 // 根据列表id,为每条记录添加若干个标签
 export interface ITag {
     userId: number,
-    tags: string[]
+    tags: string[],
+    id?: number
 }
 
 const addTagsAPI = (val: ITag) => {
     const {userId, tags} = val;
     return $http.request({
         method: 'post',
-        url: '/user/add/tags',
+        url: '/user/tags',
         data: {
             userId,
             tags
         }
     })
 }
+// 根据tag的id,删除标签
+const delTagAPI = (id: number) => {
+    return $http.request({
+        method: 'delete',
+        url: `/user/tags/${id}`
+    })
+}
+
 export {
     getPageListAPI,
     addItemAPI,
     delItemAPI,
     editItemAPI,
-    addTagsAPI
+    addTagsAPI,
+    delTagAPI
 }
