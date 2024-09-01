@@ -3,7 +3,7 @@ import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
 import {InjectRepository} from '@nestjs/typeorm';
 import {User} from './entities/user.entity';
-import {FindManyOptions, Like, Repository} from 'typeorm';
+import {FindManyOptions, FindOptionsWhere, Like, Repository} from 'typeorm';
 import {Tags} from './entities/tags.entity';
 import {UpdateTagsDto} from './dto/update-tags.dto';
 
@@ -119,13 +119,21 @@ export class UserService {
         // 每次存取userId的tags时，先删除该userId下添加了所有记录行
         // where子句中条件tags.user_Id= :id 冒号前的空格不能少，否则报错
 
-        await this.tag_tb
-            .createQueryBuilder('tags')
-            .delete()
-            .where('tags.user_id= :id', {
-                id: bodyInfo.userId,
-            })
-            .execute();
+        // await this.tag_tb
+        //     .createQueryBuilder('tags')
+        //     .delete()
+        //     .where('tags.user_id= :id', {
+        //         id: bodyInfo.userId,
+        //     })
+        //     .execute();
+
+        await this.tag_tb.delete(
+            {
+                user: {
+                    id: bodyInfo.userId
+                }
+            } as FindOptionsWhere<Tags>
+        )
 
         // 2.将前端传过来的参数tags数组，存入tags表，同时根据useId组成数组
         const tagList: Tags[] = [];
@@ -160,20 +168,22 @@ export class UserService {
          *
          *
          * */
-            // 1.leftJoinAndSelect()添加select关键字，查询部分字段---返回标准的列
-        const result = await this.user.createQueryBuilder('user').select(['user.id', 'user.name', 'user.desc']).leftJoinAndSelect("user.tags", "tags", "tags.user_id=user.id").getMany();
+        // 1.leftJoinAndSelect()添加select关键字，查询部分字段---返回标准的列
+        // const result = await this.user.createQueryBuilder('user').select(['user.id', 'user.name', 'user.desc']).leftJoinAndSelect("user.tags", "tags", "tags.user_id=user.id").getMany();
 
         // 2.leftJoinAndMap()，可以实现对返回数据细粒度的控制,不查询某些字段，可以在实体定义中，设置{select:false}
         // const result = await this.user.createQueryBuilder('account')
         //         .leftJoinAndMapMany("account.tags", Tags, "tags", "account.id=tags.user_id")
         //         .getMany();
+
+        // 3.leftJoinAndMapMany()，注意它和LeftJoinAndMapOne()的区别
         //     const result = await this.user.createQueryBuilder('user')
         //         .select(['user.id', 'user.name', 'user.desc'])
         //         .leftJoinAndMapMany("user.tags",qb=>{
         //             return qb.subQuery().select(['id','user_id']).from(Tags,"tags");
         //         },"tags", "tags.user_id=user.id")
         //         .getMany();
-        console.log("result", result);
+        // console.log("result", result);
 
         return `成功添加标签！`;
     }
@@ -207,13 +217,20 @@ export class UserService {
         //     .where('tags.user_id= :id', {id: userId})
         //     .getMany();
 
-        const tagList = await this.tag_tb.find({
+        // const tagList = await this.tag_tb.find({
+        //         where: {
+        //             user: {id: userId}
+        //         }
+        //     } as FindManyOptions<Tags>
+        // );
+
+        const tagList = await this.tag_tb.find(
+            {
                 where: {
                     user: {id: userId}
                 }
             } as FindManyOptions<Tags>
-        );
-
+        )
 
         /**
          * 1.传入的实体，updateTagsDto，可以是@Body的参数中获取
