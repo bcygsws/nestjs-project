@@ -34,18 +34,28 @@
         </el-button>
       </div>
       <!--表格内容区-->
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="table" style="width: 100%">
+        <el-table-column label="ID" align="center" prop="id"/>
         <el-table-column label="名字" align="center" prop="name"/>
         <el-table-column label="描述" align="center" prop="desc"/>
-        <el-table-column label="ID" align="center" prop="id"/>
-        <el-table-column label="标签" align="center" prop="label">
+        <el-table-column label="创建时间" align="center" prop="createdAt">
+          <template #default="scoped">
+            {{ formatDate(scoped.row['createdAt']) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="修改时间" align="center" prop="updatedAt">
+          <template #default="scoped">
+            {{ formatDate(scoped.row['updatedAt']) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Tags" align="center" prop="label">
           <!--利用作用域插槽，某一列中嵌入其他标签-->
           <template #default="scope">
             <!--打印当前 行内容 ，就是scope.row -->
             <!--{{ scope.row }}-->
             <el-space>
               <el-tag
-                  v-for="item in scope.row['label']"
+                  v-for="item in scope.row['tags']"
                   :key="item.id"
                   class="mx-1"
                   closable
@@ -74,7 +84,7 @@
                 type="success"
                 @click="handleAddTags(scope.row)"
             >
-              标签
+              添加
             </el-button>
 
           </template>
@@ -140,7 +150,7 @@
 <script lang="ts" setup>
 // 图片组件
 import {Search, Plus} from '@element-plus/icons-vue';
-import {computed, onMounted, reactive, ref, watchEffect} from 'vue'
+import {onMounted, reactive, ref, watchEffect} from 'vue'
 import {
   addItemAPI,
   addTagsAPI,
@@ -154,6 +164,7 @@ import {
 } from "@/apis/table";
 import {ElMessage, FormInstance} from 'element-plus';
 import _ from 'lodash';
+import {formatDate} from "../utils/format.ts";
 // 表单域ref对象
 const formRef = ref<FormInstance>();
 // 控制修改和添加数据时对话框的显示和隐藏
@@ -191,6 +202,7 @@ const resetForm = {
 };
 // 存储到请求列表
 const tableData = ref<IUser[]>([]);
+const table = ref<IUser[]>([]);
 // 存储标签列表
 const tagList = ref<ITag[]>([]);
 /**
@@ -468,8 +480,9 @@ const closeTag = async (tagId: number, userId: number) => {
   console.log(userId);
   // 记录行id
   tagInput.userId = userId;
-  const tag: IUser[] = tableData.value.filter(item => item.id === userId);
-  tagList.value = tag[0].label!;
+  let tag: IUser[] = tableData.value.filter(item => item.id === userId);
+  console.log('tag-test', tag);
+  tagList.value = tag[0].tags!;
   tagList.value.some((val, index) => {
     if (val.id === tagId) {
       tagList.value.splice(index, 1);
@@ -478,7 +491,7 @@ const closeTag = async (tagId: number, userId: number) => {
   })
 
 
-  const res = await delTagAPI(tagId);
+  const res = await delTagAPI({userId, tagId});
   console.log(res.data);
   if (res.data.code === 200) {
     // 1.提示信息
@@ -503,16 +516,10 @@ const closeTag = async (tagId: number, userId: number) => {
  * @description:
  *
  * */
-// watchEffect(() => {
-//   // 先从前端的tableData删除标签
-//   tableData.value.some(item => {
-//     if (item.id === tagInput.userId) {
-//       item.label = tagList.value;
-//       return true;
-//     }
-//   })
-//
-// })
+watchEffect(() => {
+  table.value = _.cloneDeep(tableData.value);
+
+})
 
 
 </script>

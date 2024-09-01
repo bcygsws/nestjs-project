@@ -12,7 +12,8 @@ export interface IUser {
     id?: number
     name: string
     desc: string
-    label?: ITag[]
+    tags?: ITag[]
+    cratedAt?: string
 }
 
 export interface IInfo {
@@ -85,10 +86,11 @@ const addTagsAPI = (val: ITag) => {
     })
 }
 // 根据tag的id,删除标签
-const delTagAPI = (id: number) => {
+const delTagAPI = (val: any) => {
+    const {userId, tagId} = val;
     return $http.request({
         method: 'delete',
-        url: `/user/tags/${id}`
+        url: `/user/tags/${userId}/${tagId}`
     })
 }
 

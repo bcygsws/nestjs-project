@@ -1,5 +1,10 @@
-import {CallHandler, ExecutionContext, Injectable, NestInterceptor} from '@nestjs/common';
-import {map, Observable} from 'rxjs';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
+import { map, Observable } from 'rxjs';
 
 /**
  * @name:全局的响应拦截器
@@ -10,21 +15,21 @@ import {map, Observable} from 'rxjs';
  *
  * */
 interface IRes<T> {
-    data: T
+  data: T;
 }
 
 @Injectable()
 export class ItcInterceptor<T = any> implements NestInterceptor {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<IRes<T>> {
-        console.log('拦截器');
-        return next.handle().pipe(
-            map(data => {
-                return {
-                    data,
-                    code: 200,
-                    msg: 'success'
-                }
-            })
-        )
-    }
+  intercept(context: ExecutionContext, next: CallHandler): Observable<IRes<T>> {
+    console.log('拦截器');
+    return next.handle().pipe(
+      map((data) => {
+        return {
+          data,
+          code: 200,
+          msg: 'success',
+        };
+      }),
+    );
+  }
 }
