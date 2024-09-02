@@ -5,6 +5,14 @@
  * ts-node  .\index.ts
  * 执行该ts文件，ts-node工具全局安装
  *
+ * ts两类命令：
+ * ts-node 执行ts文件
+ *
+ * tsc工具创建配置配置、构建和监听
+ * tsc --init
+ * tsc--build
+ * tsc --watch
+ *
  * 类装饰器的语法：
  * 1.声明一个类型注解为ClassDecorator的函数
  * 2. @装饰器名 置于需要传入的类上方
@@ -21,7 +29,7 @@
 const doc: ClassDecorator = (target: any) => {
     console.log(target);// target打印类名
     // 为此类添加属性，如同：class 定义类，声明属性一样
-    target.prototype.name = "魏无忌";
+    target.prototype.name = "魏无忌11";
 
 }
 

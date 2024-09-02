@@ -21,9 +21,9 @@ const Get = (url: string): MethodDecorator => {
         console.log(descriptor.value);
         const func = descriptor.value;
         axios.get(url).then((res) => {
-            func(res, {status: 200})
+            func(res, {status: 200})// 调用方法
         }).catch((e) => {
-            func(e, {status: 500})
+            func(e, {status: 500})// 调用方法
         })
 
 

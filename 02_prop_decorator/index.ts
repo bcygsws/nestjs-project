@@ -80,10 +80,10 @@ name
 //         console.log(this.name);
 //     }
 // }
-//
-// // doc(XiaoMan);
-//
 // const xm: any = new XiaoMan()
+
+// doc(XiaoMan);
+
 /*
 方法装饰器打印内容：
 {}
