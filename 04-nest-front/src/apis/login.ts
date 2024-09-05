@@ -13,8 +13,8 @@ import $http from "@/utils/http";
 // }
 // 提交接口
 export interface IForm {
-    admin: string
-    pwd: string
+    username: string
+    password: string
     checkPass: string
 }
 
@@ -22,7 +22,7 @@ const submitLoginAPI = (val: IForm) => {
     console.log(val);
     return $http.request({
         method: 'POST',
-        url: '/api/login/create',
+        url: '/api/login',
         data: val
     })
 

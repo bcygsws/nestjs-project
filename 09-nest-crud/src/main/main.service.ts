@@ -34,7 +34,6 @@ export class MainService {
              * main/main.service.ts中注释部分
              *
              *
-             *
              * */
             const mainRepository = this.dataSource.getRepository(Main);
             const fromInfo = await mainRepository.findOne({where: {id: fromId}});

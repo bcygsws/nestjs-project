@@ -17,11 +17,11 @@
           class="demo-ruleForm"
           label-position="left"
       >
-        <el-form-item label="账号" prop="admin">
-          <el-input type="text" v-model="ruleForm.admin"/>
+        <el-form-item label="账号" prop="username">
+          <el-input type="text" v-model="ruleForm.username"/>
         </el-form-item>
-        <el-form-item label="密码" prop="pwd">
-          <el-input v-model="ruleForm.pwd" type="password" autocomplete="off"/>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="ruleForm.password" type="password" autocomplete="off"/>
         </el-form-item>
         <el-form-item label="验证码" prop="checkPass">
           <div class="code">
@@ -56,7 +56,7 @@ const router = useRouter();
 
 const ruleFormRef = ref<FormInstance>();
 // 设置验证码图片的请求路径
-const codeUrl = ref<string>("/api/login/code");
+const codeUrl = ref<string>("/api/captcha");
 // 点击图片，重新生成一个验证码
 const resetCode = () => {
   // 更改一下图片的请求路径即可
@@ -98,14 +98,14 @@ const validateCode = (rule: any, value: any, callback: any) => {
 }
 
 const ruleForm = reactive({
-  admin: 'admin',
-  pwd: '123456',
+  username: 'admin',
+  password: '123456',
   checkPass: ''
 })
 
 const rules = reactive<FormRules<typeof ruleForm>>({
-  admin: [{validator: checkAdmin, trigger: 'blur'}],
-  pwd: [{validator: validatePwd, trigger: 'blur'}],
+  username: [{validator: checkAdmin, trigger: 'blur'}],
+  password: [{validator: validatePwd, trigger: 'blur'}],
   checkPass: [{validator: validateCode, trigger: 'blur'}],
 })
 
