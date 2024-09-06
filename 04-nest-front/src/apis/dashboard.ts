@@ -1,5 +1,5 @@
 import ResType from './shared';
-import $http from "@/utils/http";
+import $http from "@/utils/http.ts";
 // GET 请求后端图片下载接口-流方式
 const getImgStreamAPI = (url: string) => {
     // 方式一，使用axios;需要配置responseType响应头类型为arraybuffer或者blob
@@ -26,7 +26,7 @@ const getImgStreamAPI = (url: string) => {
 const uploadSinImgAPI = (data: FormData) => {
     return $http.request<ResType<any>>({
         method: 'POST',
-        url: '/api/upload/album',
+        url: 'upload/album',
         headers: {// 设置请求标头的信息
             'Content-Type': 'multipart/form-data'
         },

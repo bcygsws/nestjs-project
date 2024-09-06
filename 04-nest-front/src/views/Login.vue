@@ -42,17 +42,18 @@
       </el-form>
     </el-card>
   </div>
-
-
 </template>
+
 <script lang="ts" setup>
 import {reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from 'element-plus'
 import {ElMessage} from "element-plus";
 import {submitLoginAPI} from "@/apis/login.ts";
 import {useRouter} from 'vue-router';
+import useTokenStore from "@/store";
 
 const router = useRouter();
+const tokenStore = useTokenStore();
 
 const ruleFormRef = ref<FormInstance>();
 // 设置验证码图片的请求路径
@@ -64,7 +65,9 @@ const resetCode = () => {
 
 }
 
-const checkAdmin = (rule: any, value: string, callback: any) => {
+// const checkAdmin = (rule: any, value: string, callback: any) => {
+// 使用下划线 _ 代替 rule，注释掉未被使用的变量
+const checkAdmin = (_: any, value: string, callback: any) => {
   if (!value) {
     return callback(new Error('账号为空，请先输入账号'));// 账号框为空时，给出提示
   }
@@ -76,7 +79,7 @@ const checkAdmin = (rule: any, value: string, callback: any) => {
   }
 }
 
-const validatePwd = (rule: any, value: string, callback: any) => {
+const validatePwd = (_: any, value: string, callback: any) => {
   if (!value) {
     return callback(new Error('密码为空，请先输入密码'));// 密码框为空时，给出提示
   }
@@ -87,7 +90,7 @@ const validatePwd = (rule: any, value: string, callback: any) => {
     callback(new Error('密码的长度在5至16个字符之间'));
   }
 }
-const validateCode = (rule: any, value: any, callback: any) => {
+const validateCode = (_: any, value: any, callback: any) => {
   if (value === '') {
     callback(new Error('请输入验证码'))
   } else if (value.length !== 4) {
@@ -119,12 +122,16 @@ const submitForm = (formEl: FormInstance | undefined) => {
       // 2.登录信息提交至后端,此处直接传入ruleForm,不需要单个拼接变成普通对象
       const res = await submitLoginAPI(ruleForm);
       console.log(res);
+      console.log(res.data['access_token']);
       if (res.data.code === 200) {
         // 1.登录成功提示
         ElMessage({
           type: 'success',
           message: res.data.message
         });
+        // 2.存储token
+        tokenStore.saveAccessToken(res.data['access_token']);
+        tokenStore.saveRefreshToken(res.data['refresh_token']);
 
         // 4.登录成功，导航到 /home主面板
         await router.push('/home');

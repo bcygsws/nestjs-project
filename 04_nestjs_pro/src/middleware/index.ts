@@ -28,15 +28,15 @@ export class Logger implements NestMiddleware {
         // 例如：白名单whiteList
         const whiteList = ['/user/num', '/user/obj'];
         console.log('嘿嘿，我在中间件中，执行了');
-        // if (whiteList.includes(req.path)) {// 当前路由在白名单列表中，则放行
-        //     next();
-        // } else {
-        //     res.send("糟糕，被中间件拦截了");
-        // }
+        if (whiteList.includes(req.path)) {// 当前路由在白名单列表中，则放行
+            next();
+        } else {
+            res.send("糟糕，被中间件拦截了");
+        }
 
 
         // 测试全局中间件时，注释掉上面代码
-        next();
+        // next();
 
     }
 }

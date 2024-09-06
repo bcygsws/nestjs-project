@@ -6,6 +6,6 @@
  * */
 export const jwtConstant = {
     secret: 'my secret key',
-    expiresIn: '2h'
+    expiresIn: '30m'
     // algorithm: 'HS256'
 }

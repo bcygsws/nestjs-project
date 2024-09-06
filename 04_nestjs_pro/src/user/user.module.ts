@@ -4,8 +4,10 @@ import {UserController} from './user.controller';
 import {UserService2} from "./user.service2";
 import * as console from "console";
 import {Logger} from "../middleware";
-
+import {DynamicModule} from "../dynamic_module/dynamic.module";
+// 如果DynamicModule模块中，使用@Global()修饰，则只需要在app.module中注册一次；其他模块不需要imports，也能使用
 @Module({
+    // imports: [DynamicModule.findDynamic({path: '/weiwuji'})],
     controllers: [UserController],
     // providers:[UserService],// 简写方式
     providers: [

@@ -67,6 +67,7 @@ export class UserController {
 
     // 获取动态模块中的路径
     // 访问：localhost:3000/user/dyn
+    // @Global()装饰器注解的全局动态模块，在app.module中注册一次，在其他模块中，无需再使用imports:[]，可以直接注入了
     @Get('dyn')
     findDyn() {
         return this.url;
@@ -106,10 +107,10 @@ export class UserController {
     // 访问：localhost:3000/user
     @Get()
     findAll(@Res() res) {
-       res.send({
-           code:200,
-           message:"请求成功了，兄弟们"
-       })
+        res.send({
+            code: 200,
+            message: "请求成功了，兄弟们"
+        })
     }
 
     // 为@Body装饰器传参，直接拿到这个路由参数

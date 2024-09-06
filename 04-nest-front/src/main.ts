@@ -5,13 +5,15 @@ import ElementPlus from 'element-plus';
 // 引入element plus的样式文件
 import 'element-plus/dist/index.css';
 import router from '@/router/index';
+import {createPinia} from "pinia";
 
 const app = createApp(App);
 // 全局引入element-plus插件
 app.use(ElementPlus);
+// 注册pinia
+app.use(createPinia());
 // 注册路由
 app.use(router);
-
 app.mount('#app');
 
 /**

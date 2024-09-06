@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import * as SVGCaptcha from 'svg-captcha';
+
 /**
  * @nestjs使用session
  * 1.装包
@@ -41,7 +42,12 @@ export class AppService {
         res.send(captcha.data);
     }
 
-    getHello(): string {
-        return 'Hello World!';
+
+    getHello() {
+        return {
+            code: 200,
+            message: 'success',
+            data: "Test: Hello World!"
+        };
     }
 }

@@ -1,5 +1,5 @@
 // import ResType from "@/apis/shared";
-import $http from "@/utils/http";
+import $http from "@/utils/http.ts";
 
 
 // 1.获取验证码API

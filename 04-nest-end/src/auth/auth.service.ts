@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {UsersService} from "../users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -28,12 +28,14 @@ export class AuthService {
 
     // 登录方法login
     async login(user: User) {
-        const payload = {username: user.username, sub: user.id};
+        const payload = {username: user.username, id: user.id};
+        const _payload = {id: user.id};
         // 根据载荷payload,使用jwtService的sign方法生成token
         // 前端处理规则：
         // 1.将token存入localStorage
         // 2.在请求头中携带token，格式为：Authorization:Bearer + token
-        const access_token = this.jwtService.sign(payload);
+        const access_token = this.jwtService.sign(payload, {expiresIn: '30m'});
+        const refresh_token = this.jwtService.sign(_payload, {expiresIn: '7d'});
         console.log(user.id);
         // 3.将生成的token存入数据库
         await this.user_tb.update(user.id, {token: access_token});
@@ -41,8 +43,38 @@ export class AuthService {
         return {
             code: 200,
             message: '成功返回token',
-            access_token: access_token
+            access_token: access_token,
+            refresh_token: refresh_token
         }
     }
+
+    // 刷新token
+    async refreshToken(token: string) {
+        try {
+            // 1.验证refresh_token
+            const decode = this.jwtService.verify(token);
+            // 2.获取用户信息
+            const user = await this.user_tb.findOne({
+                where: {
+                    id: decode.id
+                }
+            });
+            // 3.生成新的access_token和refresh_token
+            const access_token = this.jwtService.sign({id: decode.id, username: user.username}, {expiresIn: '30m'});
+            const refresh_token = this.jwtService.sign({id: decode.id}, {expiresIn: '7d'});
+            return {
+                code: 200,
+                message: '成功返回token',
+                access_token: access_token,
+                refresh_token: refresh_token
+            }
+
+
+        } catch (e) {
+            throw new HttpException('refresh_token 已过期', HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
 }
 

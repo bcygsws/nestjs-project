@@ -1,4 +1,4 @@
-import {Body, CanActivate, Controller, Get, Post, Req, Res, Session, UseGuards} from '@nestjs/common';
+import {Body, CanActivate, Controller, Get, Param, Post, Query, Req, Res, Session, UseGuards} from '@nestjs/common';
 import {AppService} from './app.service';
 import {AuthGuard} from "@nestjs/passport/dist/auth.guard";
 import {AuthService} from "./auth/auth.service";
@@ -39,6 +39,10 @@ export class AppController {
      * sjmtM4V0D7K6dm4
      * auth: 类型为Bearer token
      *
+     * 3.token过期重新请求token
+     * 参考：https://www.bilibili.com/video/BV1zM411c7h6/?spm_id_from=pageDriver&vd_source=2806005ba784a40cae4906d632a64bd6
+     *
+     *
      * */
 
     @UseGuards(AuthGuard('local') as CanActivate | Function)
@@ -52,16 +56,38 @@ export class AppController {
         // return request['user'];
         // 第二步：返回token给前端
         // 第三步：验证码验证
-        if (checkPass.toLowerCase() === session.code.toLowerCase()) {
+        console.log(session.code);
+        if (session.code && checkPass.toLowerCase() === session.code.toLowerCase()) {
             return this.authService.login(request['user']);
 
         }
         return {
-            code: 401,
+            code: 501,
             message: '验证码错误'
         }
 
     }
+
+    // 2.token过期重新请求token
+    /**
+     * token过期重新请求token
+     * 请求方式：GET
+     * url地址: localhost:3000/refresh_token?refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmF
+     *
+     * 参考：双token无感刷新
+     * https://juejin.cn/post/7363193808521379879
+     *
+     *
+     *
+     *
+     *
+     * */
+    @Get('refresh_token')
+    refreshToken(@Req() request: Request, @Query('refreshToken') refreshToken: string) {
+        return this.authService.refreshToken(refreshToken);
+    }
+
+    // 3.测试接口-携带token访问后端接口
 
     @UseGuards(AuthGuard('jwt') as CanActivate | Function)
     @Get('profile')
@@ -72,8 +98,9 @@ export class AppController {
         return request['user'];
     }
 
-    @Get()
-    getHello(): string {
+    @UseGuards(AuthGuard('jwt') as CanActivate | Function)
+    @Get('test')
+    getHello() {
         return this.appService.getHello();
     }
 }
