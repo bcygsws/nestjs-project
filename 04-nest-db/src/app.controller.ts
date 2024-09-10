@@ -2,12 +2,14 @@ import {Body, CanActivate, Controller, Get, Param, Post, Query, Req, Res, Sessio
 import {AppService} from './app.service';
 import {AuthGuard} from "@nestjs/passport/dist/auth.guard";
 import {AuthService} from "./auth/auth.service";
+import {Auth} from "./auth/auth.decorator";
 
 @Controller()
 export class AppController {
     constructor(private readonly appService: AppService, private authService: AuthService) {
     }
 
+    @Auth('permission')
     @Get('captcha')
     getCaptcha(@Res() response, @Session() session) {
         return this.appService.getCaptcha(response, session);
@@ -46,6 +48,7 @@ export class AppController {
      * */
 
     @UseGuards(AuthGuard('local') as CanActivate | Function)
+    @Auth('permission')
     @Post('login')
     doLogin(@Req() request: Request, @Session() session, @Body('checkPass') checkPass: string) {
         // console.log(typeof checkPass);
@@ -83,6 +86,8 @@ export class AppController {
      *
      *
      * */
+
+    @Auth('permission')
     @Get('refresh_token')
     refreshToken(@Req() request: Request, @Query('refreshToken') refreshToken: string) {
         return this.authService.refreshToken(refreshToken);
@@ -90,7 +95,6 @@ export class AppController {
 
     // 3.测试接口-携带token访问后端接口
 
-    @UseGuards(AuthGuard('jwt') as CanActivate | Function)
     @Get('profile')
     doProfile(@Req() request: Request) {
         // console.log(request);
@@ -99,7 +103,6 @@ export class AppController {
         return request['user'];
     }
 
-    @UseGuards(AuthGuard('jwt') as CanActivate | Function)
     @Get('test')
     getHello() {
         return this.appService.getHello();

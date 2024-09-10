@@ -10,7 +10,7 @@ export class UsersService {
     constructor(@InjectRepository(User) private readonly user_tb: Repository<User>) {
     }
 
-    async doUnameMatch(username: string) {
+    async checkUsername(username: string) {
         // 注意：这里的find方法，不用findOne，findOne返回的是对象；而find是返回数组
         const adminList = await this.user_tb.find({where: {username: username}});
         console.log(adminList);

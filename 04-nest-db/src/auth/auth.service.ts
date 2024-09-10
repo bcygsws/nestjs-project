@@ -17,7 +17,7 @@ export class AuthService {
 
     async validateUser(username: string, pwd: string) {
         // 获取用户
-        const user = await this.usersService.doUnameMatch(username);
+        const user = await this.usersService.checkUsername(username);
         if (user && user.password === pwd) {
             const {password, ...result} = user;//剔除密码
             return result;// 返回用户信息
@@ -48,7 +48,7 @@ export class AuthService {
         }
     }
 
-    // 刷新token
+    // 刷新token的请求
     async refreshToken(token: string) {
         try {
             // 1.验证refresh_token
