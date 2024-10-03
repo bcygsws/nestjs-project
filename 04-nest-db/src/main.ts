@@ -1,9 +1,10 @@
-import {NestFactory} from '@nestjs/core';
+import {NestFactory, Reflector} from '@nestjs/core';
 import {AppModule} from './app.module';
 import * as session from 'express-session';
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {join} from 'path';
 import * as cors from 'cors';
+import {JwtAuthGuard} from "./auth/auth.guard";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,6 +18,8 @@ async function bootstrap() {
     }));
     // 2.配置跨域中间件cors
     app.use(cors());
+    // 3.全局注册守卫
+    app.useGlobalGuards(new JwtAuthGuard(new Reflector()));
     // 为静态资源图片设置虚拟目录
     // 设置前缀后，需要通过 http://localhost:3000/bcy/1724525104910.jpg 访问到图片
     app.useStaticAssets(join(__dirname, 'images'), {
