@@ -85,7 +85,7 @@ export class AuthService {
                     id: decode.id
                 }
             });
-            // 3.生成新的access_token和refresh_token
+            // 3.重新生成一组新的(access_token,refresh_token)
             const access_token = this.jwtService.sign({id: decode.id, username: user.username}, {expiresIn: '30m'});
             const refresh_token = this.jwtService.sign({id: decode.id}, {expiresIn: '7d'});
             return {
