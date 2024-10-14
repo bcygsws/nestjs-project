@@ -9,7 +9,7 @@ import {
     UseInterceptors,
     UploadedFile,
     Res,
-    Req, UploadedFiles
+    Req, UploadedFiles, NestInterceptor
 } from '@nestjs/common';
 import {UploadService} from './upload.service';
 import {CreateUploadDto} from './dto/create-upload.dto';
@@ -83,14 +83,15 @@ export class UploadController {
      * */
     @Post('album')
     // 文件拦截器，将提交的多张图片，存放在本地了
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(FilesInterceptor('files') as NestInterceptor | Function)
     upload(@UploadedFiles() files) {
         console.log(files);
         // 返回格式如：[{name:'',url:''},]的对象数组
         const DOMAIN = 'http://localhost:3000/bcy/';
         const imageArray = files.map(item => ({
             name: item.originalname,
-            url: `${DOMAIN}${item.filename}`
+            url: `${DOMAIN}${item.filename}`,
+            filename: item.filename
         }))
 
 
@@ -140,7 +141,7 @@ export class UploadController {
         // 1.实例化流对象
         const tarStream = new zip.Stream();
         // 2.添加下载文件路径，addEntry。这是个异步操作
-        const file_url = join(__dirname, '../images/1724542070166.jpg');
+        const file_url = join(__dirname, '../images/1728873143868.jpg');
         await tarStream.addEntry(file_url);
         // 3.设置响应头（不设置下面两处响应头，和方式一 一样，只不过生成的是stream.zip,解压后也还是 图片文件）
         // 设置响应头后，前端也需要处理，将图片读出来

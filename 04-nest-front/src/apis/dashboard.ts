@@ -26,7 +26,7 @@ const getImgStreamAPI = (url: string) => {
 const uploadSinImgAPI = (data: FormData) => {
     return $http.request<ResType<any>>({
         method: 'POST',
-        url: 'upload/album',
+        url: 'api/upload/album',
         headers: {// 设置请求标头的信息
             'Content-Type': 'multipart/form-data'
         },

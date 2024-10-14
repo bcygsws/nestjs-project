@@ -57,7 +57,7 @@ const tokenStore = useTokenStore();
 
 const ruleFormRef = ref<FormInstance>();
 // 设置验证码图片的请求路径
-const codeUrl = ref<string>("/api/captcha");
+const codeUrl = ref<string>("/api/users/captcha");
 // 点击图片，重新生成一个验证码
 const resetCode = () => {
   // 更改一下图片的请求路径即可

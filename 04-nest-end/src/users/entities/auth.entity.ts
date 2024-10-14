@@ -9,7 +9,8 @@ import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
-    @Column()
+    // 用户名一般是唯一的，{unique:true}设置唯一约束
+    @Column({unique: true})
     username: string;
     @Column()
     password: string;

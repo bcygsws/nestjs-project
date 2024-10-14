@@ -22,7 +22,7 @@ const submitLoginAPI = (val: IForm) => {
     console.log(val);
     return $http.request({
         method: 'POST',
-        url: '/api/login',
+        url: '/api/users/login',
         data: val
     })
 

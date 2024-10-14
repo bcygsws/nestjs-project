@@ -10,7 +10,7 @@ import ResType from "@/apis/shared";
 const getListAPI = () => {
     return $http.request<ResType<string>>({
         method: "GET",
-        url: "/api/test"
+        url: "/api/users/test"
     });
 }
 export {getListAPI};

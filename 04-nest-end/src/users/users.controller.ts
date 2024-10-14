@@ -1,16 +1,19 @@
-import {Body, CanActivate, Controller, Get, Param, Post, Query, Req, Res, Session, UseGuards} from '@nestjs/common';
-import {AppService} from './app.service';
+import {Body, CanActivate, Controller, Get, Post, Query, Req, Res, Session, UseGuards} from '@nestjs/common';
+import {AuthService} from "../auth/auth.service";
+import {UsersService} from "./users.service";
 import {AuthGuard} from "@nestjs/passport/dist/auth.guard";
-import {AuthService} from "./auth/auth.service";
 
-@Controller()
-export class AppController {
-    constructor(private readonly appService: AppService, private authService: AuthService) {
+@Controller('users')
+export class UsersController {
+    constructor(private readonly authService: AuthService, private readonly usersService: UsersService) {
+
     }
+
+    // 1.获取验证码
 
     @Get('captcha')
     getCaptcha(@Res() response, @Session() session) {
-        return this.appService.getCaptcha(response, session);
+        return this.usersService.getCaptcha(response, session);
 
     }
 
@@ -68,7 +71,6 @@ export class AppController {
         }
 
     }
-
     // 2.token过期重新请求token
     /**
      * token过期重新请求token
@@ -102,6 +104,6 @@ export class AppController {
     @UseGuards(AuthGuard('jwt') as CanActivate | Function)
     @Get('test')
     getHello() {
-        return this.appService.getHello();
+        return this.usersService.getHello();
     }
 }

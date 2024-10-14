@@ -48,7 +48,7 @@
         </template>
       </el-upload>
       <!--上传图片模块-提交到后端-->
-      <el-button @click="submitImage">提交</el-button>
+      <el-button @click="uploadImg">提交</el-button>
 
       <el-dialog v-model="dialogVisible">
         <img w-full :src="dialogImageUrl" alt="Preview Image"/>
@@ -60,10 +60,13 @@
     </div>
   </div>
 
+  <div>
+    <h4>下载图片</h4>
+    <button @click="download">下载</button>
+    <hr/>
+    <img :src="base64Image" v-if="flag" width="100" height="100" alt=""/>
 
-  <button @click="download">下载</button>
-  <hr/>
-  <img :src="base64Image" v-if="flag" width="100" height="100" alt=""/>
+  </div>
 </template>
 <script lang="ts" setup>
 // 定义前端接收流的方法
@@ -77,20 +80,20 @@ import type {UploadFile} from 'element-plus'
 
 // 定义上传图片信息的数组,双向绑定
 const fileList = ref([]);
-const dialogImageUrl = ref('')
-const dialogVisible = ref(false)
-const disabled = ref(false)
+const dialogImageUrl = ref('');
+const dialogVisible = ref(false);
+const disabled = ref(false);
 
 /**
- * @name:submitImage
+ * @name: uploadImg
  * @description:图片上传后，点击按钮-提交，事件处理
  *
  * */
-const submitImage = async () => {
+const uploadImg = async () => {
   console.log(fileList.value);
   // 封装form-data
   const data = new FormData()
-  console.log('test',data);
+  console.log('test', data);
   fileList.value.forEach((item: any) => {
     // files名称与后端文件拦截器FilesInterceptor中保持一致
 
@@ -118,7 +121,7 @@ const handleDownload = (file: UploadFile) => {
 
 //下载文件有以下两种方式：
 // 一、apis文件中，使用axios,定义请求流文件的方法：new Blob([res.data])
-const getStreamImage = async (url: string) => {
+const downloadStreamImg = async (url: string) => {
   // axios返回arrayBuffer或者blog,fetch也是一样
   const res = await getImgStreamAPI(url);
   console.log(res);
@@ -204,7 +207,7 @@ const showImage = async (url: string) => {
 
 // button标签子元素a的点击事件
 const download = () => {
-  getStreamImage("/api/upload/stream");
+  downloadStreamImg("/api/upload/stream");
 }
 /**
  * @name:handleSuccess

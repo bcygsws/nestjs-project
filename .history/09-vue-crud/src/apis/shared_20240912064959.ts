@@ -3,4 +3,5 @@ export interface ResType<T> {
 	msg: string;
 	data?: T;
 }
+
 // 获取分页数据接口

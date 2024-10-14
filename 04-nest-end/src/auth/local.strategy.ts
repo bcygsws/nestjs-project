@@ -1,7 +1,7 @@
 import {PassportStrategy} from "@nestjs/passport";
 import {Strategy} from "passport-local";
 import {AuthService} from "./auth.service";
-import {Injectable, UnauthorizedException} from "@nestjs/common";
+import {BadRequestException, Injectable, UnauthorizedException} from "@nestjs/common";
 
 /**
  * 使用本地策略，验证用户名和密码是否正确
@@ -15,11 +15,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     }
 
 // 注：对于本地策略，用户需要一个具有以下签名的validate(username,password)方法，如果找到了用户，并且凭据有效，则返回用户对象；
-// 否则，抛出未授权错误；给前端返回 {"message": "Unauthorized","statusCode": 401}
+// 否则，给前端(response.data值)返回 {"message": "用户名或密码错误",error:"bad request","statusCode": 400}
     async validate(username: string, password: string) {
-        const user = await this.authService.validateUser(username, password);
+        // 依次核验 用户名、密码
+        const user = await this.authService.checkUser(username, password);
         if (!user) {
-            throw new UnauthorizedException()// statusCode:401，返回未授权错误
+            throw new BadRequestException('用户名或密码错误');// statusCode:400，返回请求错误
         }
         return user;// 返回用户信息
     }
