@@ -70,7 +70,7 @@ export class UserModule implements NestModule {
         // b.path键对象
         // localhost:3000/user POST,放行了  /user不在白名单，post方式，也没有在forRoutes()中，这个路由没有消费中间件，能够通过
         // consumer.apply(Logger).forRoutes({ path:'user',method: RequestMethod.GET});
-        consumer.apply(Logger).forRoutes({ path:'user',method: RequestMethod.POST});
+        consumer.apply(Logger).forRoutes({ path:'user',method: RequestMethod.GET});
         // localhost:3000/user GET,被拦截了  /user不在白名单，get方式，限定在forRoutes()参数里；执行路由被拦截的分支
         // consumer.apply(Logger).forRoutes({ path:'user',method: RequestMethod.GET});
 
