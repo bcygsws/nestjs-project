@@ -49,7 +49,7 @@ class XiaoMan {
 // doc(XiaoMan);
 
 const xm: any = new XiaoMan();
-console.log(xm.name);
+// console.log(xm.name);
 /*
 [class XiaoMan]
 魏无忌

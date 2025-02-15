@@ -14,12 +14,12 @@
  *
  *
  * */
-// const doc: PropertyDecorator = (target: any, propertyKey: string | symbol) => {
-//     console.log(target);// {}
-//     console.log(propertyKey);// name
-//
-// }
-//
+const doc: PropertyDecorator = (target: any, propertyKey: string | symbol) => {
+    console.log(target);// {}
+    console.log(propertyKey);// name
+
+}
+
 // // 02.定义属性装饰器
 // /**
 //  * @doc的作用
@@ -29,18 +29,18 @@
 //  * @doc这样做的好处：就可以在不破坏类 XiaoMan的情况下，添加一些属性
 //  *
 //  * */
-// class XiaoMan {
-//     @doc
-//     name: string
-//
-//     constructor() {
-//         this.name = "马千红";
-//     }
-// }
-//
-// // doc(XiaoMan);
-//
-// const xm: any = new XiaoMan();
+class XiaoMan {
+    @doc
+    name: string
+
+    constructor() {
+        this.name = "马千红";
+    }
+}
+
+// doc(XiaoMan);
+
+const xm: any = new XiaoMan();
 /*
 打印结果：
 {}
@@ -100,12 +100,12 @@ getName
 
 // 4.定义参数装饰器
 // 在属性装饰器的基础上，又增加了第三参数：index，它表示一个索引,第几个参数添加了装饰器（具体看ts-node运行后的结果）
-const doc: ParameterDecorator = (target: any, propertyKey: string | symbol, index: number) => {
-    console.log(target);// {}
-    console.log(propertyKey);// name
-    console.log(index);
-
-}
+// const doc: ParameterDecorator = (target: any, propertyKey: string | symbol, index: number) => {
+//     console.log(target);// {}
+//     console.log(propertyKey);// name
+//     console.log(index);
+//
+// }
 
 /**
  * @doc的作用
@@ -115,21 +115,21 @@ const doc: ParameterDecorator = (target: any, propertyKey: string | symbol, inde
  * @doc这样做的好处：就可以在不破坏类 XiaoMan的情况下，添加一些属性
  *
  * */
-class XiaoMan {
-    name: string
-
-    constructor() {
-        this.name = "马千红";
-    }
-
-    getName(name: string, @doc age: number) {
-        console.log(this.name);
-    }
-}
+// class XiaoMan {
+//     name: string
+//
+//     constructor() {
+//         this.name = "马千红";
+//     }
+//
+//     getName(name: string, @doc age: number) {
+//         console.log(this.name);
+//     }
+// }
 
 // doc(XiaoMan);
 
-const xm: any = new XiaoMan()
+// const xm: any = new XiaoMan()
 /*
 参数装饰器打印内容：
 {}
