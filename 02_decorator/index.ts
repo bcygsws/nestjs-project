@@ -8,10 +8,10 @@
  *
  * 注：使用装饰器时，tsconfig.json中必须设置"experimentalDecorators": true
  *
- * 注2：使用tsc --build，编译出错;是没有设置 experimentalDecorators：true
- * 可以直接使用ts-node执行当前文件
+ * 注2：使用tsc --build，编译报错；
+ * 那是因为没有设置 experimentalDecorators：true；开启后，再次编译成功
  *
- * @author：Bao Chengyi
+ * 也可以直接使用ts-node执行当前文件
  *
  * */
 // a.定义一个类装饰器doc

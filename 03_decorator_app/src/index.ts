@@ -5,7 +5,8 @@
  * 接口地址：http://123.207.32.32:8000/home/multidata
  *
  * 步骤：
- * 1.tsc --init 生成ts.config.json文件
+ * 1.tsc --init 生成ts.config.json文件,开启其中的experimentalDecorators:true;否则，装饰器无法编译成功
+ * 然后，安装axios，npm i axios -S
  * npm init -y 生成package.json文件，方便后续安装包axios
  *
  * 2.编写类ListController
@@ -26,7 +27,9 @@ const Get = (url: string): MethodDecorator => {
         console.log(descriptor);
         // 获取返回相应内容的那个方法名称
         const func = descriptor.value;
+        console.log("func",func);
         axios.get(url).then((res) => {
+            // 转化成传递实际参数
             func(res, {code: 200});
         }).catch((err) => {
             func(err, {code: 500});
