@@ -33,10 +33,10 @@ export class UserController {
         // console.log("req===", req);
         // console.log("res===", res);
         const captcha = svgCaptcha.create({
-            size: 4,// 设置验证码几位字符
+            size: 4,
             ignoreChars: '0o1i',// 忽略易混淆的字符
             noise: Math.random()*3,// 干扰线条数
-            color: true,// 设置验证码字符有颜色
+            color: true,
             width: 150,
             height: 40,
             fontSize: 40,

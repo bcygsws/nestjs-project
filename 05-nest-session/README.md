@@ -119,6 +119,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 - npm i @types/express-session --save-dev
 - 在main.ts中注册,并注意session参数secret、name、cookie、rolling参数的配置
 
+<<<<<<< HEAD
 ### 二、安装包axios
 
 - npm i axios --save
@@ -130,3 +131,5 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 - npm i @types/svg-captcha --save
 
 
+=======
+>>>>>>> ec38ddae13b43b5400b1060eaa98a4d416ad24bf
