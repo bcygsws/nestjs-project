@@ -4,7 +4,7 @@
 *@date: 2025/2/17 18:25
 -->
 <template>
-  <div>MainView组件</div>
+  <div>MainView</div>
 </template>
 <script lang="ts" setup>
 
