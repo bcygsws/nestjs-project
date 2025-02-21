@@ -33,7 +33,7 @@
     <!--下载图片-->
     <div class="download">
       <el-button plain @click="downloadImg">下载图片：传统方式</el-button>
-      <el-button type="primary" plain>下载图片：压缩图片方式</el-button>
+      <el-button type="primary" plain @click="downloadStream">下载图片：压缩图片方式</el-button>
 
     </div>
   </div>
@@ -42,7 +42,7 @@
 import {ref} from 'vue';
 import {genFileId} from 'element-plus';
 import type {UploadInstance, UploadProps, UploadRawFile} from 'element-plus'
-import {downloadImgAPI} from "@/apis/image.ts";
+import {downloadImgAPI, downloadStreamAPI} from "@/apis/image.ts";
 
 const upload = ref<UploadInstance>();
 
@@ -82,6 +82,26 @@ const downloadImg = async () => {
   link.click();
   document.body.removeChild(link);// 下载完成后，移除标签元素a
   window.URL.revokeObjectURL(url);// revoke撤销、废除、使无效
+}
+
+/**
+ * @desc:downloadStream方法
+ *
+ * */
+const downloadStream = async () => {
+  const res = await downloadStreamAPI();
+  console.log("res=======", res);
+  const link = document.createElement('a');
+  const url = window.URL.createObjectURL(new Blob([res.data]));
+  console.log("url=======", url);
+  link.href = url;
+  link.download = "BaoChengyi.zip";
+  document.body.appendChild(link);// 添加到文档中
+  link.click();// 模拟点击下载
+  document.body.removeChild(link);// 下载完成后，移除标签元素a
+  window.URL.revokeObjectURL(url);// 下载完成后释放blob url
+
+
 }
 </script>
 

@@ -8,7 +8,8 @@ const $http = axios.create({
 // 参考文档：https://juejin.cn/post/7442284498740527114
 $http.interceptors.request.use(config => {
     console.log(config);
-    if (config.url!.indexOf('/api/download/img') !== -1) {
+    if (config.url!.indexOf('/api/download/img') !== -1
+        || config.url!.indexOf('/api/download/stream') !== -1) {
         config.responseType = 'blob';
     }
     return config;
