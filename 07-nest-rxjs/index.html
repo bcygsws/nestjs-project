@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>rxjs在dom中的使用</title>
+	<style>
+        body {
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+	</style>
+</head>
+<body>
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/rxjs/8.0.0-alpha.2/rxjs.umd.js"></script>
+<script type="text/javascript">
+	let dom;
+	dom = fromEvent(document.body, 'click').pipe(map(e => e.target));
+	dom.subscribe(e => {
+		console.log(e);
+	});
+</script>
+</body>
+</html>

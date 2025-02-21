@@ -14,10 +14,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *
  * RxJs使用观察者模式，用来编写异步队列和事件处理
  *
+ * 案例1：index.ts 演示Observable
+ *
  *
  * */
 const rxjs_1 = require("rxjs");
-// 类似于迭代器，next发出通知；complete完成
+// Observable类似于迭代器，next发出通知；complete完成
 const observable = new rxjs_1.Observable(subscriber => {
     subscriber.next(1);
     subscriber.next(2);

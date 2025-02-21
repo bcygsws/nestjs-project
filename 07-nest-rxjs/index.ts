@@ -12,10 +12,12 @@
  *
  * RxJs使用观察者模式，用来编写异步队列和事件处理
  *
+ * 案例1：index.ts 演示Observable
+ *
  *
  * */
 import {Observable} from 'rxjs';
-// 类似于迭代器，next发出通知；complete完成
+// Observable类似于迭代器，next发出通知；complete完成
 const observable = new Observable(subscriber => {
     subscriber.next(1);
     subscriber.next(2);
@@ -28,6 +30,15 @@ const observable = new Observable(subscriber => {
 });
 // 在控制台使用subscribe订阅；在控制台输出1，2，3，4
 // 注：其中4是（停顿3s后输出4）
+/**
+ * 监听时，是一个next键的对象
+ * observable.subscribe({
+ *    next:(val)=>{
+ *     console.log(val);
+ *    }
+ * })
+ *
+ * */
 observable.subscribe({
     next: (value) => {
         console.log(value);
