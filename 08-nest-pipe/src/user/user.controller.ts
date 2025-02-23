@@ -13,15 +13,13 @@ export class UserController {
      * 管道转换
      * 管道自定义校验
      *
-     *
-     *
      * */
 
     @Post()
     // 方式一：自定义校验管道UserPipe
-    // create(@Body(UserPipe) createUserDto: CreateUserDto) {
+    create(@Body(UserPipe) createUserDto: CreateUserDto) {
     // 方式二、使用内置管道ParseIntPipe
-    create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    // create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
         console.log("createUserDto: ", createUserDto);
         return this.userService.create(createUserDto);
     }
