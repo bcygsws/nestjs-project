@@ -1,12 +1,17 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, SetMetadata} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
 import {UserService} from './user.service';
 import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
 import {UserGuard} from "./user.guard";
-import {ReqUrl, Role} from "../decorator/my.decorator";
+import {Role} from "./user.decorator";
+import {ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
+
+// ApiProperty()为post请求参数设置描述信息，在dto中
 
 @Controller('user')
 @UseGuards(UserGuard)
+@ApiTags('守卫接口')// 为接口设置分组名称
+@ApiBearerAuth()
 export class UserController {
     constructor(private readonly userService: UserService) {
     }
@@ -17,15 +22,16 @@ export class UserController {
     }
 
     @Get()
-    // @UseGuards(UserGuard)
-    // @SetMetadata('role', ['admin'])
     @Role('admin')
-    findAll(@ReqUrl() url: string) {
-        console.log("url===", url);// url=== /user?role=admin
+    @ApiOperation({summary: '用户权限控制', description: '详情xxxxxxxx'})// 为某个接口设置描述信息
+    @ApiQuery({name: 'page', required: true, description: '分页'})// 为请求参数设置描述信息
+    @ApiResponse({status: 403, description: '返回用户列表'})
+    findAll() {
         return this.userService.findAll();
     }
 
     @Get(':id')
+    @ApiParam({name: 'id', required: true, description: '用户id'})// 为接口参数设置描述信息
     findOne(@Param('id') id: string) {
         return this.userService.findOne(+id);
     }

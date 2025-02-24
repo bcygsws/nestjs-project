@@ -14,7 +14,8 @@ export class UserGuard implements CanActivate {
     ): boolean | Promise<boolean> | Observable<boolean> {
         console.log('user guard守卫执行了');
         const admin = this.reflector.get<string[]>('role', context.getHandler());
-        console.log("admin", admin);
+        console.log("admin", admin);// 元数据值，结果：['admin']
+        console.log("context.getHandler", context.getHandler());// 获取设置元数据的那个方法名，结果：[Function: findAll]
         const request = context.switchToHttp().getRequest<Request>();
         // 简化写法
         // setMetadata('role',['admin'])中的参数，和前端localhost:3000/user?role=admin取值是否一样
