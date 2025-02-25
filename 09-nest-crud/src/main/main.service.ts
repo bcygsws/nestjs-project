@@ -6,7 +6,7 @@ import {Main} from "./entities/main.entity";
 
 /**
  * @name:使用DataSource全方位管理事务
- *
+ * @desc:功能：使用管理事务处理一个转账过程
  *
  * */
 
@@ -23,7 +23,7 @@ export class MainService {
         try {
             /**
              *
-             * @在service类，处理事务的三种方式：
+             * @desc:在service类，处理事务的三种方式：
              * 参考文档：
              * https://docs.nestjs.com/techniques/database#typeorm-transactions
              * 注：

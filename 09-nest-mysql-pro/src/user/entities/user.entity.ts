@@ -1,19 +1,23 @@
-import {Column, CreateDateColumn, Entity, Generated, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, Generated, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
+        // @PrimaryGeneratedColumn('uuid')
     id: number;
 
     @Column({type: 'varchar', length: 255, unique: true, nullable: false, default: 'admin'})
     name: string;
 
 
-    @Column({type: 'varchar', nullable: false, default: '123456'})
+    @Column({type: 'int', nullable: false, default: '123456'})
     password: string;
 
     @CreateDateColumn({type: 'timestamp'})// 创建时间
-    create_time: Date
+    create_time: Date;
+
+    @UpdateDateColumn({type: 'timestamp'})// 更新时间
+    update_time: Date;
 
     @Generated('uuid')// 自动生成列
     uuid: string;

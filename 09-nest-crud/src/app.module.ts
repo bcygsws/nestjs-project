@@ -16,7 +16,7 @@ import {MainModule} from './main/main.module';
             username: 'root', //账号
             password: '123456', //密码
             host: 'localhost', //host
-            port: 3306, //
+            port: 3306, // 端口号
             database: 'user_db', //库名
             // entities: [__dirname + '/**/*.entity{.ts,.js}'], //实体文件;开发模式下，同步实体开启，该选项可以关闭
             synchronize: true, //synchronize字段代表是否自动将实体类同步到数据库,注：生产环境下，自动将实体同步到数据库时不允许的

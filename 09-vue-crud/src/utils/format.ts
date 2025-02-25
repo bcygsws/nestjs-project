@@ -1,5 +1,9 @@
 import {format} from 'date-fns';
+
 /**
+ * @desc: 时间日期的格式化
+ * 使用date-fns库
+ *
  * @param date 时间戳或Date对象
  * @param formatStr
  * 1.秒级时间戳：10位，毫秒级时间戳：13位
@@ -10,9 +14,9 @@ import {format} from 'date-fns';
  * */
 
 export function formatDate(date: number | Date, formatStr: string = 'yyyy-MM-dd HH:mm:ss') {
-    if (typeof date === 'number' && date.toString().length == 10) {
+    if (typeof date === 'number' && date.toString().length == 10) {// 秒级时间戳
         return format(new Date(date * 1000), formatStr);
-    } else {
+    } else {// 毫秒级时间戳
         return format(new Date(date), formatStr);
     }
 }
