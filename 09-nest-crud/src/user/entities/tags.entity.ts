@@ -23,5 +23,5 @@ export class Tags {
   // 如果不指定name值，生成的默认列名是userId,这种驼峰格式
   @JoinColumn({ name: 'user_id',referencedColumnName: 'id' })
   // user: User;
-  user: Relation<User>;
+  user: Relation<User>;// 关系、关联User
 }
