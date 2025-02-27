@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
-import {Like, Repository} from "typeorm";
+import {ILike, Like, Repository} from "typeorm";
 import {User} from "./entities/user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 
@@ -18,7 +18,8 @@ export class UserService {
         return this.user.save(data);
     }
 
-        // where or条件查询写法，参考：https://typeorm.nodejs.cn/find-options
+    // where or条件查询写法，参考：https://typeorm.nodejs.cn/find-options
+    // 和Like关键字不同，ILike是不区分大小写的模糊比对
     async findAll(keywords: string, page: number, pageSize: number) {
         const list = await this.user.find({
             select: ['id', 'name', 'desc', 'createdAt', 'updatedAt'],// 没有包含label字段
