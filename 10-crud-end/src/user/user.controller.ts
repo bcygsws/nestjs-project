@@ -13,6 +13,15 @@ export interface SearchParams {
 export class UserController {
     constructor(private readonly userService: UserService) {
     }
+    /**
+     * @desc:添加数据接口
+     * 请求方式：POST
+     * 参数：CreateUserDto
+     *  url:/user
+     *
+     *
+     *
+     * */
 
     @Post()
     create(@Body() createUserDto: CreateUserDto) {
