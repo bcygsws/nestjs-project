@@ -16,7 +16,7 @@
     <!--添加数据-->
     <div class="content">
       <div class="add">
-        <el-button type="primary" size="small">
+        <el-button type="primary" size="small" @click="addUser">
           添加数据
           <el-icon class="el-icon--right">
             <Plus/>
@@ -69,22 +69,22 @@
         </el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
+            <el-button size="small" @click="editUser(scope.$index, scope.row)"
             >修改
             </el-button
             >
             <el-button
                 size="small"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)"
+                @click="delUser(scope.$index, scope.row)"
             >删除
             </el-button
             >
             <el-button
                 size="small"
                 type="primary"
-                @click="handleDelete(scope.$index, scope.row)"
-            >添加
+                @click="changeTags(scope.$index, scope.row)"
+            >标签
             </el-button
             >
           </template>
@@ -102,7 +102,23 @@
           class="mt-4"
       />
     </div>
+    <!--添加数据对话框-->
+    <!--定义一个flag量：true为添加数据，false为修改数据-->
+    <FormDialog
+        :flag="flag"
+        :form="form"
+        :visible="visible"
+        @handleSub="handleSub"
+        @handleDialogForm="handleDialogForm"
+    />
   </div>
+  <!--修改标签tag的对话框-->
+  <TagDialog
+      :isTagShow="isTagShow"
+      :tagForm="tagForm"
+      @handleTag="handleTag"
+      @handleDialogForm1="handleDialogForm1"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -111,6 +127,22 @@ import {Search, Plus} from '@element-plus/icons-vue';
 import {getListAPI} from "@/apis/table.ts";
 import type {IList, IQuery, IData} from '@/apis/table.ts';
 import formatDate from "../../utils/format.ts";
+import FormDialog from "@/components/FormDialog.vue";
+import TagDialog from "@/components/TagDialog.vue";
+
+// 添加/修改对话框的显示或隐藏
+const visible = ref(false);
+
+// 标签对话框
+const isTagShow = ref(false);
+// 维护是添加数据还是修改数据
+const flag = ref(false);
+
+const form = reactive({
+  name: '',
+  desc: '',
+});
+const tagForm=ref([]);
 
 
 // 主要参数page当前页码、pageSize每页容量、total总数、keywords关键字
@@ -157,12 +189,37 @@ interface User {
   address: string
 }
 
-const handleEdit = (index: number, row: User) => {
+/**
+ * @desc:handleEdit()方法
+ * 修改数据
+ *
+ *
+ **/
+const editUser = (index: number, row: User) => {
+  console.log(index, row);
+  visible.value = true;
+  flag.value = false;
+}
+const delUser = (index: number, row: User) => {
   console.log(index, row)
 }
-const handleDelete = (index: number, row: User) => {
-  console.log(index, row)
+/**
+ * @desc:修改标签方法changeTags
+ *
+ * */
+const changeTags = (index: number, row: User) => {
+  console.log(index, row);
+  isTagShow.value = true;
 }
+/**
+ * @desc:handleTag()方法
+ * 修改当前行的标签
+ *
+ * */
+const handleTag = (val: any) => {
+  console.log("val====标签数据", val);
+}
+
 /**
  * @desc:switchPage方法
  * 切换页码事件处理
@@ -171,6 +228,42 @@ const handleDelete = (index: number, row: User) => {
 const switchPage = (page: number) => {
   info.page = page;
   getList();
+}
+
+/**
+ * @desc:添加数据addUser
+ *
+ * */
+const addUser = () => {
+  visible.value = true;
+  flag.value = true;
+
+}
+/**
+ * @desc:handleSub()方法
+ * 接收子组件修改或添加后的表单数据
+ *
+ * */
+const handleSub = (val: any) => {
+  console.log("val ====", val);
+}
+/**
+ * @desc：handleDialogForm()方法
+ * 处理对话框的显示或隐藏
+ *
+ * */
+const handleDialogForm = (val: any) => {
+  visible.value = val;
+}
+
+/**
+ * @desc:handleDialogForm1()方法
+ * 修改标签后，子组件向父组件传值方法
+ *
+ *
+ * */
+const handleDialogForm1 = (val: any) => {
+  isTagShow.value = val;
 }
 </script>
 <style lang="scss" scoped>
@@ -204,4 +297,6 @@ const switchPage = (page: number) => {
     }
   }
 }
+
+/*对话框样式*/
 </style>

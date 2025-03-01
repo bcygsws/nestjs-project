@@ -4,10 +4,12 @@ import {UpdateUserDto} from './dto/update-user.dto';
 import {ILike, Like, Repository} from "typeorm";
 import {User} from "./entities/user.entity";
 import {InjectRepository} from "@nestjs/typeorm";
+import {Tags} from "./entities/tag.entity";
 
 @Injectable()
 export class UserService {
-    constructor(@InjectRepository(User) private readonly user: Repository<User>) {
+    constructor(@InjectRepository(User) private readonly user: Repository<User>,
+                @InjectRepository(Tags) private readonly tags: Repository<Tags>) {
     }
 
     create(createUserDto: CreateUserDto) {
@@ -46,6 +48,11 @@ export class UserService {
         };
     }
 
+    async findTags() {
+        const res = await this.tags.createQueryBuilder("tag").select("tag.tags").groupBy("tags").getRawMany();
+        console.log(res);
+        return res;
+    }
 
     findOne(id
                 :

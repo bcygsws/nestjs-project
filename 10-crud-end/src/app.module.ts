@@ -3,6 +3,7 @@ import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {UserModule} from './user/user.module';
 import {TypeOrmModule} from "@nestjs/typeorm";
+import { TagModule } from './tag/tag.module';
 
 @Module({
     imports: [UserModule,
@@ -19,7 +20,8 @@ import {TypeOrmModule} from "@nestjs/typeorm";
             retryDelay: 500,
             retryAttempts: 10,
             autoLoadEntities: true,
-        })
+        }),
+        TagModule
     ],
     controllers: [AppController],
     providers: [AppService],

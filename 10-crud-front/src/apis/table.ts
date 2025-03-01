@@ -1,4 +1,5 @@
 import {$http} from '@/utils/shared.ts';
+import type {ResType} from "@/apis/shared.ts";
 // 查询参数
 export type IQuery = {
     page: number;
@@ -21,11 +22,7 @@ export type IData = {
     list: Array<IList>;
     total: ITotal
 }
-export type ResType<T> = {
-    code: number;
-    data: T;
-    msg: string;
-}
+
 
 // ResType里泛型最后再明确
 function getListAPI<T>(info: Partial<IQuery>) {

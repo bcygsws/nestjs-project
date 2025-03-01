@@ -19,7 +19,8 @@ export class UserController {
      * 参数：CreateUserDto
      *  url:/user
      *
-     *
+     *  1.添加一行数据时，从表中，必须添加一行数据{user_id:当前生成的, id:tags的id, tags:tag标签名称}
+     *  2.name标签为唯一
      *
      * */
 
@@ -57,6 +58,25 @@ export class UserController {
     findOne(@Param('id') id: string) {
         return this.userService.findOne(+id);
     }
+
+    /**
+     * @desc:根据tags表，查找所有可能得tags名称
+     * 请求：GET
+     * url: /user/tags
+     * 返回：
+     * {
+     *     code:200,
+     *     data: [ { tags: 'Tag1' }, { tags: 'Tag2' }, { tags: 'Tag3' } ],
+     *     msg: 'success'
+     * }
+     *
+     *
+     * */
+    @Get('/tags')
+    findTags() {
+        return this.userService.findTags();
+    }
+
 
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
