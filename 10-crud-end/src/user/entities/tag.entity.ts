@@ -10,7 +10,10 @@ export class Tags {
     tags: string;
 
 
-    @ManyToOne(() => User, (user) => user.tags)
+    @ManyToOne(() => User, (user) => user.tags, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+    })
     @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
     user: User;
 

@@ -59,25 +59,6 @@ export class UserController {
         return this.userService.findOne(+id);
     }
 
-    /**
-     * @desc:根据tags表，查找所有可能得tags名称
-     * 请求：GET
-     * url: /user/tags
-     * 返回：
-     * {
-     *     code:200,
-     *     data: [ { tags: 'Tag1' }, { tags: 'Tag2' }, { tags: 'Tag3' } ],
-     *     msg: 'success'
-     * }
-     *
-     *
-     * */
-    @Get('/tags')
-    findTags() {
-        return this.userService.findTags();
-    }
-
-
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
         return this.userService.update(+id, updateUserDto);

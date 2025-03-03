@@ -164,27 +164,33 @@ export class UserService {
          *
          * 和Prisma的对比：
          * 参考：https://juejin.cn/post/7323203806794498082?from=search-suggest
+         * 1.leftJoinAndSelect()添加select关键字，查询部分字段---返回标准的列
+         * const result = await this.user.createQueryBuilder('user')
+         * .select(['user.id', 'user.name', 'user.desc']).
+         * leftJoinAndSelect("user.tags", "tags", "tags.user_id=user.id")
+         * .getMany();
+         *
+         *
+         *  2.leftJoinAndMapOne()和leftJoinAndMapMany()的区别
+         *  参考文档：https://blog.csdn.net/aminwangaa/article/details/110085540
+         *
+         *  leftJoinAndMap()，可以实现对返回数据细粒度的控制,不查询某些字段，可以在实体定义中，设置{select:false}
+         *         const result = await this.user.createQueryBuilder('account')
+         *                 .leftJoinAndMapOne("account.tags", Tags, "tags", "account.id=tags.user_id")
+         *                 .getMany();
+         *
+         *  3.leftJoinAndMapMany()，注意它和LeftJoinAndMapOne()的区别
+         *             const result = await this.user.createQueryBuilder('user')
+         *                 .select(['user.id', 'user.name', 'user.desc'])
+         *                 .leftJoinAndMapMany("user.tags",qb=>{
+         *                     return qb.subQuery().select(['id','user_id']).from(Tags,"tags");
+         *                 },"tags", "tags.user_id=user.id")
+         *                 .getMany();
+         *         console.log("result", result);
          *
          *
          *
          * */
-        // 1.leftJoinAndSelect()添加select关键字，查询部分字段---返回标准的列
-        // const result = await this.user.createQueryBuilder('user').select(['user.id', 'user.name', 'user.desc']).leftJoinAndSelect("user.tags", "tags", "tags.user_id=user.id").getMany();
-
-        // 2.leftJoinAndMap()，可以实现对返回数据细粒度的控制,不查询某些字段，可以在实体定义中，设置{select:false}
-        // const result = await this.user.createQueryBuilder('account')
-        //         .leftJoinAndMapMany("account.tags", Tags, "tags", "account.id=tags.user_id")
-        //         .getMany();
-
-        // 3.leftJoinAndMapMany()，注意它和LeftJoinAndMapOne()的区别
-        //     const result = await this.user.createQueryBuilder('user')
-        //         .select(['user.id', 'user.name', 'user.desc'])
-        //         .leftJoinAndMapMany("user.tags",qb=>{
-        //             return qb.subQuery().select(['id','user_id']).from(Tags,"tags");
-        //         },"tags", "tags.user_id=user.id")
-        //         .getMany();
-        // console.log("result", result);
-
         return `成功添加标签！`;
     }
 

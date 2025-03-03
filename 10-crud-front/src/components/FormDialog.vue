@@ -46,7 +46,7 @@ const props = defineProps({
     }
   }
 });
-const emits = defineEmits(['handleSub', 'handleDialogForm']);
+const emits = defineEmits(['handleSub', 'handleMod', 'handleDialogForm']);
 // 计算属性的get/set，维护子组件中的dialogForm状态
 const dialogForm = computed({
   get() {
@@ -68,9 +68,8 @@ const submit = (flag: boolean) => {
   dialogForm.value = false;
   if (flag) {// 添加数据逻辑
     emits('handleSub', props.form);
-
   } else {// 修改数据逻辑
-    emits('handleSub', props.form);
+    emits('handleMod', props.form);
 
   }
 }

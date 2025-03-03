@@ -5,16 +5,21 @@
 -->
 <template>
   <el-dialog v-model="dialogForm" title="修改标签" width="40%">
-    <el-form :model="tagForm">
+    <el-form :model="form">
       <el-form-item label="姓名" :label-width="60">
-        <el-tree-select
-            v-model="curVal"
-            :data="cat"
+        <el-select
+            v-model="form.curVal"
             multiple
-            :render-after-expand="false"
-            show-checkbox
+            placeholder="请选择标签，可多选"
             style="width: 100%"
-        />
+        >
+          <el-option
+              v-for="item in cat"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+        </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -28,25 +33,25 @@
   </el-dialog>
 </template>
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
+import {onMounted, Ref, ref} from 'vue';
 /*接收父组件传递的属性*/
 import {computed} from "vue";
 import {getTagCatAPI} from "@/apis/tag.ts";
+import type {ITag} from '@/apis/tag.ts';
 
-export interface ITag {
-  value: number;
-  label: string;
-}
-
+// tag标签的分类{label:'',value:''}
 const cat = ref<ITag[]>([]);
+// 选中的标签集合，如：['Tag1','Tag2']
+const tags = ref<string[]>([]);
+
 const getTagCat = async () => {
   const res = await getTagCatAPI();
   console.log("getTagCat", res);
   if (res.code === 200) {
-    cat.value = res.data.map((item: any, index) => {
+    cat.value = res.data.map((item: any) => {
       return {
         label: item['tags'],
-        value: index + 1
+        value: item['tags']
       }
     })
     console.log("cat: ", cat.value);
@@ -54,11 +59,18 @@ const getTagCat = async () => {
   }
 }
 
+function getValueByTag(tag: string) {
+  const res = cat.value.find((item: ITag) => {
+    if (item.label === tag) {
+      return item.value;
+    }
+  })
+  return res?.value;
+}
+
 onMounted(() => {
   getTagCat();
 })
-const curVal = ref();
-console.log("curVal: ", curVal);
 const props = defineProps({
   isTagShow: {
     type: Boolean,
@@ -68,16 +80,38 @@ const props = defineProps({
     type: Array<any>
   }
 });
-const emits = defineEmits(['handleTag', 'handleDialogForm1']);
+const emits = defineEmits(['handleTag', 'handleTagDialog', 'handleTagSubmit']);
 // 计算属性的get/set，维护子组件中的dialogForm状态
 const dialogForm = computed({
   get() {
     return props.isTagShow;
   },
   set(val) {
-    emits('handleDialogForm1', val);
+    emits('handleTagDialog', val);
   }
 });
+// 表单数据
+const form = ref<{ curVal: Ref }>({
+  curVal: computed({
+    get() {
+      if (!props.tagForm?.length) {
+        return [];
+      } else {
+        const res = props.tagForm.reduce((res, cur) => {
+          return [...res, getValueByTag(cur.tags)]
+        }, []);
+        console.log("yyyyy", res);
+        return res;
+      }
+    },
+    set(val) {
+      tags.value = val;
+      console.log("curVal中val: ", val);
+      emits('handleTag', val);
+    }
+  })
+});
+console.log("curVal: ", form.value.curVal);
 
 /**
  * @desc:submit()方法
@@ -89,8 +123,9 @@ const dialogForm = computed({
 const submit = () => {
   // 关闭对话框
   dialogForm.value = false;
-// 向父组件emit tagForm数据
-  emits('handleTag', curVal.value);
+// 向父组件emit form表单数据
+  console.log("form: ", form.value);
+  emits('handleTagSubmit', form.value.curVal);
 
 }
 

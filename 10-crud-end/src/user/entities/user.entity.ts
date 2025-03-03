@@ -6,14 +6,14 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: false})
     name: string;
 
     @Column()
     desc: string;
 
     @Column({type: 'simple-array', nullable: true})
-    label: string[];
+    label: string;
 
     @CreateDateColumn({type: 'timestamp'})
     createdAt: Date;
@@ -21,7 +21,10 @@ export class User {
     @UpdateDateColumn({type: 'timestamp'})
     updatedAt: Date;
 
-    @OneToMany(() => Tags, tags => tags.user)
+    @OneToMany(() => Tags, tags => tags.user, {
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+    })
     tags: Tags[];
 
 

@@ -1,5 +1,6 @@
 import {$http} from '@/utils/shared.ts';
 import type {ResType} from "@/apis/shared.ts";
+import type {ITagList} from "@/apis/tag.ts";
 // 查询参数
 export type IQuery = {
     page: number;
@@ -11,10 +12,18 @@ export type IList = {
     id: number
     name: string
     desc: string
-    createdAt: string
-    updatedAt: string
-    tags: Array<any>
+    createdAt?: string
+    updatedAt?: string
+    tags?: Array<ITagList>
+    label?: any
 }
+
+export interface IForm {
+    id?: number
+    name: string
+    desc: string
+}
+
 export type ITotal = {
     total: number
 }
@@ -39,6 +48,43 @@ function getListAPI<T>(info: Partial<IQuery>) {
     })
 }
 
+// 【添加数据】 api
+function addUserAPI<T>(info: Partial<IForm>) {
+    const {name, desc} = info;
+    return $http.request<ResType<T>, any>({
+        method: "POST",
+        url: "/user",
+        data: {
+            name,
+            desc
+        }
+    })
+}
+
+// 【根据id修改数据】api
+function editUserByIdAPI(id: number, info: Partial<IForm>) {
+    const {name, desc} = info;
+    return $http.request<ResType<any>, any>({
+        method: "PATCH",
+        url: `/user/${id}`,
+        data: {
+            name,
+            desc
+        }
+    })
+}
+
+// 【根据id删除数据】api
+function deleteUserByIdAPI(id: number) {
+    return $http.request<ResType<any>, any>({
+        method: "DELETE",
+        url: `/user/${id}`
+    })
+}
+
 export {
-    getListAPI
+    getListAPI,
+    addUserAPI,
+    editUserByIdAPI,
+    deleteUserByIdAPI
 }

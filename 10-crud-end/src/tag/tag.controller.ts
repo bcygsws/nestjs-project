@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe} from '@nestjs/common';
 import {TagService} from './tag.service';
 import {CreateTagDto} from './dto/create-tag.dto';
 import {UpdateTagDto} from './dto/update-tag.dto';
@@ -32,9 +32,21 @@ export class TagController {
         return this.tagService.findOne(+id);
     }
 
+    /**
+     * @desc:根据传入的user_id更新标签
+     * 请求方式：patch
+     * url：/tag/:id
+     *
+     * */
+
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
         return this.tagService.update(+id, updateTagDto);
+    }
+
+    @Delete(':id/:tagId')
+    removeTags(@Param('id', ParseIntPipe) id: number, @Param('tagId', ParseIntPipe) tagId: number) {
+        return this.tagService.removeTags(id, tagId);
     }
 
     @Delete(':id')
