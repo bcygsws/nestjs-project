@@ -12,13 +12,18 @@ export interface IUser {
     id?: number
     name: string
     desc: string
-    tags?: ITag[]
+    tags?: ILabel[]
     cratedAt?: string
 }
 
 export interface IInfo {
     total: number
     list: IUser[]
+}
+
+export interface ILabel {
+    id?: number;
+    tags: string;
 }
 
 // 根据keywords page pageSize分页获取数据接口
@@ -36,7 +41,7 @@ const getPageListAPI = (val: IQuery) => {
 // 添加数据接口
 const addItemAPI = (val: IUser) => {
     const {name, desc} = val;
-    return $http.request({
+    return $http.request<ResType<any>, any>({
         method: 'post',
         url: '/user',
         data: {
@@ -69,26 +74,25 @@ const editItemAPI = (val: IUser) => {
 
 // 根据列表id,为每条记录添加若干个标签
 export interface ITag {
-    userId: number,
-    tags: string[],
+    userId?: number
+    list: string[]
     id?: number
 }
 
 const addTagsAPI = (val: ITag) => {
-    const {userId, tags} = val;
-    return $http.request({
+    const {userId, list} = val;
+    return $http.request<ResType<any>, any>({
         method: 'post',
         url: '/user/tags',
         data: {
             userId,
-            tags
+            list
         }
     })
 }
 // 根据tag的id,删除标签
-const delTagAPI = (val: any) => {
-    const {userId, tagId} = val;
-    return $http.request({
+const delTagAPI = (userId: number, tagId: number) => {
+    return $http.request<ResType<any>, any>({
         method: 'delete',
         url: `/user/tags/${userId}/${tagId}`
     })

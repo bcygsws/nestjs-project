@@ -69,7 +69,7 @@
         <el-table-column label="操作">
           <template #default="scope">
             <el-button size="small" @click="editUser(scope.row)"
-            >修改
+            >修改用户
             </el-button
             >
             <el-button
@@ -83,7 +83,7 @@
                 size="small"
                 type="primary"
                 @click="modTag(scope.row)"
-            >标签
+            >修改标签
             </el-button
             >
           </template>

@@ -3,9 +3,11 @@ import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
 import {InjectRepository} from '@nestjs/typeorm';
 import {User} from './entities/user.entity';
-import {FindManyOptions, FindOptionsWhere, Like, Repository} from 'typeorm';
+import {FindManyOptions, FindOneOptions, FindOptionsWhere, Like, Repository} from 'typeorm';
 import {Tags} from './entities/tags.entity';
 import {UpdateTagsDto} from './dto/update-tags.dto';
+import {AddUserDto} from "./dto/add-user.dto";
+import {AddTagDto} from "./dto/add-tag.dto";
 
 @Injectable()
 export class UserService {
@@ -30,7 +32,8 @@ export class UserService {
         return this.user.save(data);
     }
 
-    async findAll(keywords: string, page: number, pageSize: number) {
+    async findAll(query: AddUserDto) {
+        const {page = 1, pageSize = 5, keywords = ''} = query;
         // 根据名称name字段的模糊查询
         // 1.在此基础上分页
         const list = await this.user.find({
@@ -39,9 +42,14 @@ export class UserService {
             select: ['id', 'name', 'desc', 'createdAt', 'updatedAt'],
 
             // 第二种方式，label关键字，实体类字段中设置 select:false;查询结果，也实现过滤掉了label字段
-            where: {
-                name: Like(`%${keywords}%`),
-            },
+            where: [
+                {
+                    name: Like(`%${keywords}%`),
+                },
+                {
+                    desc: Like(`%${keywords}%`)
+                }
+            ],
             order: {
                 id: 'DESC',
             },
@@ -51,9 +59,14 @@ export class UserService {
         });
         // 2.统计匹配模糊查询条件的总数
         const total = await this.user.count({
-            where: {
-                name: Like(`%${keywords}%`),
-            },
+            where: [
+                {
+                    name: Like(`%${keywords}%`),
+                },
+                {
+                    desc: Like(`%${keywords}%`)
+                }
+            ],
         });
         console.log('faaaw', list);
 
@@ -89,14 +102,15 @@ export class UserService {
      *
      * */
 
-    async addTags(bodyInfo: { userId: number; tags: string[] }) {
-        console.log(bodyInfo);
+    async addTags(bodyInfo: AddTagDto) {
+        let {userId, list} = bodyInfo;
+        list = list ? list : [];
         // 1.根据id,在user表中，查出这条记录的信息
         const userInfo = await this.user.findOne({
             where: {
-                id: bodyInfo.userId,
-            },
-        });
+                id: userId
+            }
+        } as FindOneOptions);
         console.log('--', userInfo);
         /**
          *@name:灵活的createQueryBuilder方法
@@ -127,33 +141,37 @@ export class UserService {
         //     })
         //     .execute();
 
+        // 2.删除tags表下该userId下的记录
         await this.tag_tb.delete(
             {
                 user: {
-                    id: bodyInfo.userId
+                    id: userId
                 }
             } as FindOptionsWhere<Tags>
-        )
+        );
 
         // 2.将前端传过来的参数tags数组，存入tags表，同时根据useId组成数组
-        const tagList: Tags[] = [];
+        let tagList: Tags[] = [];
         // 从Tags实体中，获取实例
-        for (const tag of bodyInfo.tags) {
-            // 每次都要创建新的记录行数据，该实例化，放在循环体内
-            const my_tag = new Tags();
-            my_tag.tags = tag;
-            // 将当前tag标签，名字为tags存入tags表
-            await this.tag_tb.save(my_tag);
-            // 将该条记录，也存入数组
-            tagList.push(my_tag);
+        if (list.length) {
+            for (const tag of list) {
+                // 每次都要创建新的记录行数据，该实例化，放在循环体内
+                const myTag = new Tags();
+                myTag.tags = tag;
+                // 将当前tag标签，名字为tags存入tags表
+                await this.tag_tb.save(myTag);
+                // 将该条记录，也存入数组
+                tagList.push(myTag);
+            }
         }
+
         // 3.已经完成将多条tags表记录存入数据库，同时存入数组tagList,并添加到当前userInfo的tags键上
-        userInfo.tags = tagList;
-        userInfo.label = JSON.stringify(tagList);
+        userInfo!.tags = tagList;
+        userInfo!.label = JSON.stringify(tagList);
         console.log('--->', userInfo.label);
         console.log('--->', userInfo);
         // 将userInfo存入user表
-        await this.user.save(userInfo);
+        return this.user.save(userInfo);
         /**
          * 联表查询
          * 1.leftJoinAndSelect()添加select关键字，查询部分字段
@@ -188,10 +206,7 @@ export class UserService {
          *                 .getMany();
          *         console.log("result", result);
          *
-         *
-         *
          * */
-        return `成功添加标签！`;
     }
 
     /**
@@ -217,18 +232,8 @@ export class UserService {
      *
      * */
     async delTag(userId: number, tagId: number) {
+        // 根据tagId从tags表中，删除该id对应的记录行
         await this.tag_tb.delete(tagId);
-        // const tagList = await this.tag_tb
-        //     .createQueryBuilder('tags')
-        //     .where('tags.user_id= :id', {id: userId})
-        //     .getMany();
-
-        // const tagList = await this.tag_tb.find({
-        //         where: {
-        //             user: {id: userId}
-        //         }
-        //     } as FindManyOptions<Tags>
-        // );
 
         const tagList = await this.tag_tb.find(
             {
@@ -245,14 +250,12 @@ export class UserService {
          *
          * */
         // 1.将tagList转为json字符串，存入数据库中
-        console.log(tagList);
-        await this.updateTag(userId, {label: JSON.stringify(tagList)});
-
         console.log('tagList===', tagList);
-        return `成功删除一个tag标签！`;
+        return this.updateTag(userId, {label: JSON.stringify(tagList)});
     }
 
     async updateTag(userId: number, updateTagsDto: UpdateTagsDto) {
+        // 根据id值，更新user表的label字段
         await this.user.update(userId, updateTagsDto);
     }
 }

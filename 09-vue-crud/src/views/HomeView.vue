@@ -27,28 +27,28 @@
       <div class="add-btn">
         <el-button
             type="primary"
-            size="default"
+            size="small"
             :icon="Plus"
             @click="handleAdd">
           添加数据
         </el-button>
       </div>
       <!--表格内容区-->
-      <el-table :data="table" style="width: 100%">
-        <el-table-column label="ID" align="center" prop="id"/>
-        <el-table-column label="名字" align="center" prop="name"/>
-        <el-table-column label="描述" align="center" prop="desc"/>
-        <el-table-column label="创建时间" align="center" prop="createdAt">
+      <el-table :data="table" style="width: 100%" stripe border>
+        <el-table-column label="ID" prop="id" width="50"/>
+        <el-table-column label="名字" prop="name" width="100"/>
+        <el-table-column label="描述" prop="desc"/>
+        <el-table-column label="创建时间" prop="createdAt" width="180">
           <template #default="scoped">
             {{ formatDate(scoped.row['createdAt']) }}
           </template>
         </el-table-column>
-        <el-table-column label="修改时间" align="center" prop="updatedAt">
+        <el-table-column label="修改时间" prop="updatedAt" width="180">
           <template #default="scoped">
             {{ formatDate(scoped.row['updatedAt']) }}
           </template>
         </el-table-column>
-        <el-table-column label="Tags" align="center" prop="label">
+        <el-table-column label="Tags" prop="label">
           <!--利用作用域插槽，某一列中嵌入其他标签-->
           <template #default="scope">
             <!--打印当前 行内容 ，就是scope.row -->
@@ -59,18 +59,17 @@
                   :key="item.id"
                   class="mx-1"
                   closable
-                  :disable-transitions="false"
-                  @close="closeTag(item.id,scope.row.id)"
+                  @close="closeTag(item.id,scope.row)"
               >
                 {{ item['tags'] }}
               </el-tag>
             </el-space>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="操作">
+        <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">
-              修改
+            <el-button size="small" type="primary" @click="handleEdit(scope.row)">
+              修改数据
             </el-button>
             <el-button
                 size="small"
@@ -84,7 +83,7 @@
                 type="success"
                 @click="handleAddTags(scope.row)"
             >
-              添加
+              修改标签
             </el-button>
 
           </template>
@@ -105,95 +104,82 @@
 
     </div>
     <!--编辑或者添加时对话框-->
-    <el-dialog v-model="dialogFormVisible" :title="flag?'添加数据':'修改数据'" width="500">
-      <el-form :model="form" :ref="formRef">
-        <el-form-item label="名字" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off"/>
-        </el-form-item>
-        <el-form-item label="描述" :label-width="formLabelWidth">
-          <el-input v-model="form.desc" autocomplete="off"/>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSave">
-            {{ flag ? '添加' : '保存' }}
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
-    <!--添加标签对话框-->
-    <el-dialog
-        v-model="dialogTagVisible"
-        title="添加标签"
-        width="30%"
-    >
-      <el-tree-select
-          v-model="tagVal"
-          :data="tagsData"
-          multiple
-          :render-after-expand="false"
-      />
+    <ChangeDialog
+        ref="changeRef"
+        :flag="flag"
+        :form="form"
+        @handleAddSubmit="handleAddSubmit"
+        @handleModSubmit="handleModSubmit"
+    />
+    <!--修改标签对话框-->
+    <TagDialog
+        :tagForm="tagForm"
+        ref="tagRef"
+        @handleTagMod="handleTagMod"
+        @handleTagSubmit="handleTagSubmit"
+    />
 
-      <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogTagVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleTagSave">添加</el-button>
-      </span>
-      </template>
-    </el-dialog>
-
-
+    <!--删除记录，对话框提示-->
+    <DelDialog
+        ref="delRef"
+        @handleDelSubmit="handleDelSubmit"
+    />
   </div>
 </template>
 <script lang="ts" setup>
 // 图片组件
 import {Search, Plus} from '@element-plus/icons-vue';
-import {onMounted, reactive, ref, watchEffect} from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import {
   addItemAPI,
   addTagsAPI,
   delItemAPI,
   delTagAPI,
   editItemAPI,
-  getPageListAPI,
+  getPageListAPI, ILabel,
   IQuery,
-  ITag,
   IUser
 } from "@/apis/table";
-import {ElMessage, FormInstance} from 'element-plus';
+import {ElMessage} from 'element-plus';
 import _ from 'lodash';
-import {formatDate} from "../utils/format.ts";
-// 表单域ref对象
-const formRef = ref<FormInstance>();
-// 控制修改和添加数据时对话框的显示和隐藏
-const dialogFormVisible = ref(false);
-// 控制【添加标签】时，对话框的显示和隐藏
-const dialogTagVisible = ref(false);
-const formLabelWidth = '40px';
+import {formatDate} from "@/utils/format.ts";
+import DelDialog from "@/components/DelDialog.vue";
+import ChangeDialog from "@/components/ChangeDialog.vue";
+import TagDialog from "@/components/TagDialog.vue";
+
+// 添加或删除数据标志;flag:true,添加数据；flag:false,修改数据
+const flag = ref(false);
+// 添加或修改数据对话框组件的ref属性
+const changeRef = ref(false);
+
+// DelDialog组件的ref属性
+const delRef = ref();
+// 记录删除对话框弹起时的id值
+const delId = ref(0);
+
 
 const pageInfo = reactive<IQuery>({
   keywords: '',
   page: 1,
   pageSize: 5,
   total: 0
-})
+});
+
+// tag表单数据
+const tagForm = ref<ILabel[]>([]);
+// 添加标签对话框组件的ref属性
+const tagRef = ref();
+// 记录当前行的id
+const tagId = ref(0);
 
 
 // 对话框里的表单数据
 let form = reactive<IUser>({
   id: 0,
   name: '',
-  desc: '',
-  label: []
+  desc: ''
 });
 
-// tag标签数据
-const tagInput = reactive<ITag>({
-  tags: [],
-  userId: 0
-})
 // 重置表单时，用到的对象resetForm
 const resetForm = {
   id: 0,
@@ -203,8 +189,6 @@ const resetForm = {
 // 存储到请求列表
 const tableData = ref<IUser[]>([]);
 const table = ref<IUser[]>([]);
-// 存储标签列表
-const tagList = ref<ITag[]>([]);
 /**
  * @description:对话框复用
  * 确定是添加数据还是修改数据？
@@ -215,26 +199,6 @@ const tagList = ref<ITag[]>([]);
  * 修改数据，回显时id不为0，就可以区分
  *
  * */
-// 定义boolean型ref,指示：添加和修改两种状态;true:添加，false:修改
-const flag = ref(true);
-
-// 对话框标签值
-const tagVal = ref();
-const tagsData = [
-  {
-    value: '1',
-    label: 'Tag1'
-  },
-  {
-    value: '2',
-    label: 'Tag2'
-  },
-  {
-    value: '3',
-    label: 'Tag3'
-  }
-];
-
 
 // 请求分页列表
 const getPageList = async () => {
@@ -244,134 +208,94 @@ const getPageList = async () => {
     // 存储分页的数据列表
     // ??表示如果其左边的值读不到，返回[]；类似||
     tableData.value = res.data?.data?.list ?? [];
+    table.value = tableData.value;
     // 存储总条数
     pageInfo.total = res.data?.data?.total;
   } else {
     // TODO: 提示错误信息
   }
 }
-
+// 初次渲染时，dom挂载完成时，请求分页列表
 onMounted(() => {
   // 请求数据
   getPageList();
-})
+});
+
 
 /**
- * @name:init()方法
- * @description:弹出对话框
- *
- * */
-const init = () => {
-  dialogFormVisible.value = true;
-}
-/**
- * @name:close()方法
- * @description:关闭对话框
- *
- * */
-const close = () => {
-  dialogFormVisible.value = false;
-
-}
-/**
- * @name:addItem()方法
+ * @name: handleAdd()方法
  * @description: 添加数据
  *
  * */
 const handleAdd = () => {
-  // console.log("id===", form.id);
+  clearForm();
   // 切换为添加数据状态
   flag.value = true;
   // 打开对话框
-  init();
-  // 5.重置表单域
-  form = reactive({...form, ...resetForm});
+  changeRef.value.dialogFormVisible = true;
 }
-const handleEdit = async (_: number, row: IUser) => {
-// 索引变量index未使用，使用下划线注释掉
-  // console.log(index, row);
+
+/**
+ * @desc：handleAddSubmit()方法
+ * 添加数据对话框，添加 按钮提交数据
+ *
+ * */
+const handleAddSubmit = async (val: IUser) => {
+  console.log("add val", val);
+  // 2.提交数据
+  // 直接表单对象放进去即可，id在里面；在接口中没有使用这个id
+  const res = await addItemAPI(val);
+  console.log(res.data);
+  if (res.data.code === 200) {
+    // 3.清空表单
+    clearForm();
+    console.log("add form", form);
+    // 4.关闭对话框
+    changeRef.value.dialogFormVisible = false;
+    // 4.重新请求分页列表
+    await getPageList();
+  }
+}
+
+/**
+ * @desc:handleEdit()方法
+ * 表格中，修改数据按钮
+ *
+ * */
+const handleEdit = async (row: IUser) => {
+  console.log("edit row", row);
   // 1.指示是修改数据状态
   flag.value = false;
   // 2.数据回显到form表单域
-  form = reactive({...form, ...row});
-  // console.log("id===", form.id);
-  // 3.弹出对话框
-  init();
+  form = Object.assign(form, {name: row.name, desc: row.desc, id: row.id});
+  console.log("edit form", form);
+  // 2.弹出对话框
+  changeRef.value.dialogFormVisible = true;
 }
+
 /**
- * @name:handleSave()方法
- * @description:对话框添加或者修改后提交，事件处理
- * 修改和添加操作提交至后端后，都应重置表单域reset
+ *@desc:handleModSubmit()方法
+ * 修改数据对话框，修改 按钮提交数据
  *
  *
  * */
-const handleSave = async () => {
-
-  console.log(flag.value);
-  if (flag.value) {//添加数据
-    // 1.表单校验
-
-    // 2.提交数据
-    // 直接表单对象放进去即可，id在里面；在接口中没有使用这个id
-    const res = await addItemAPI(form);
-    console.log(res.data);
-    if (res.data.code === 200) {
-      // 1.提示信息
-      ElMessage({
-        showClose: true,
-        message: '添加成功',
-        type: 'success'
-      });
-      // 2.重新请求分页列表
-      await getPageList();
-      // 3.关闭对话框
-      close()
-      // 4.重置表单域
-      formRef.value?.resetFields();
-    } else {
-      ElMessage({
-        showClose: true,
-        type: 'error',
-        message: '添加失败'
-      })
-      close();
-
-    }
-  } else {// 修改数据
-    // 1.表单校验
-    console.log("===", form);
-    // 2.向后端提交数据
-    const res = await editItemAPI(form);
-    console.log(res.data.code);
-    if (res.data.code === 200) {
-      // 2.修改成功提示
-      ElMessage({
-        showClose: true,
-        message: '成功修改一条数据',
-        type: 'success'
-      });
-      // 3.关闭对话框
-      close();
-      // 4.重新请求列表
-      await getPageList();
-      // 5.重置表单域
-      form = reactive({...form, ...resetForm});
-    } else {
-      ElMessage({
-        showClose: true,
-        message: '修改一条数据失败',
-        type: 'error'
-      });
-    }
-
-
+const handleModSubmit = async () => {
+  // 1.向后端提交数据
+  const res = await editItemAPI(form);
+  console.log(res.data.code);
+  if (res.data.code === 200) {
+    // 2.清空表单
+    clearForm();
+    // 3.关闭对话框
+    changeRef.value.dialogFormVisible = false;
+    // 4.重新请求列表
+    await getPageList();
   }
-
 }
+
 /**
  * @name:handleSearch()方法
  * @description:检索事件处理
- *
  *
  * */
 const handleSearch = async () => {
@@ -380,14 +304,19 @@ const handleSearch = async () => {
   if (res.data.code === 200) {
     // 存储分页的数据列表
     tableData.value = res.data?.data?.list!;
+    table.value = tableData.value;
     // 存储总条数
     pageInfo.total = res.data?.data?.total;
   }
 }
 
-const handleDelete = async (row: IUser) => {
-  // console.log(row)
-  const res = await delItemAPI(row.id!);
+/**
+ * @desc:handleDelSubmit()方法
+ * 子组件确定按钮，提交删除操作，子组件emit方法
+ *
+ * */
+const handleDelSubmit = async () => {
+  const res = await delItemAPI(delId.value);
   console.log(res.data);
   if (res.data.code === 200) {
     // 1.删除成功提示
@@ -408,6 +337,13 @@ const handleDelete = async (row: IUser) => {
 
   }
 }
+const handleDelete = async (row: IUser) => {
+  console.log(row);
+  // 表格删除按钮，点击，弹出对话框
+  delRef.value.dialogVisible = true;
+  // 更新当前行id
+  delId.value = row.id!;
+}
 
 
 /**
@@ -423,104 +359,83 @@ const switchPage = (page: number) => {
 
 }
 /**
- * @name:handleAddTags
- * @description:
- *
+ * @desc:handleAddTags()方法
+ * 点击 添加标签 按钮，为当前行添加若干标签
  *
  * */
-const handleAddTags = (raw: IUser) => {
-  dialogTagVisible.value = true
-  // 打开对话框时，更新其对应的id值
-  tagInput.userId = raw.id ?? 0;
-
+const handleAddTags = (row: IUser) => {
+  console.log("tag row", row);
+  // 打开添加tag对话框
+  tagRef.value.tagVisible = true;
+  // 记录下当前user所在行id
+  tagId.value = row.id!;
+  tagForm.value = row.tags as ILabel[];
 }
-
 /**
- * @name:handleTagSave
- * @description:保存标签
+ * @desc：handleTagMod()方法
+ * 实时修改标签对话框，同步tagForm
  *
  * */
-interface IItem {
-  label: string
-  value: string
+const handleTagMod = (val: string[]) => {
+  console.log("实时修改tagForm", val);
+  tagForm.value = val.map((item: string) => ({tags: item}));
 }
-
-const handleTagSave = async () => {
-  console.log(tagVal.value);
-  // 后端需要的是tag标签名组成的数组：例如：['Tag1','Tag2']
-  tagInput.tags = _.cloneDeep(tagsData)
-      .filter((item: IItem) => tagVal.value.includes(item.value))
-      .map(val => val.label) ?? [];
-  console.log("====", tagInput);
-  // 提交到后端
-  const res = await addTagsAPI(tagInput);
-  console.log(res.data);
-  if (res.data.code == 200) {
-    // 1.添加成功提示
-    ElMessage({
-      showClose: true,
-      message: '成功为记录添加了标签',
-      type: 'success'
-    });
-    // 2.重新请求列表
+/**
+ * @desc：handleTagSubmit()方法
+ * 子组件标签选择完成后，确定按钮提交，事件处理
+ *
+ * */
+const handleTagSubmit = async (val: string[]) => {
+  // 关闭对话框
+  tagRef.value.tagVisible = false;
+  console.log("tag submit", val);
+  // 当前行user的id值：tagId，以及表单数据val,格式示例：['Tag1','Tag2']
+  const res = await addTagsAPI({userId: tagId.value, list: val});
+  console.log("add tag res", res);
+  if (res.data.code === 200) {
+    // 重新请求列表
     await getPageList();
-    // 3.关闭对话框
-    dialogTagVisible.value = false;
-
   }
 
 }
+
 /**
  * @name:handleClose
  * @description:删除标签，事件处理
+ * 参数
+ * curId：当前删除的那个tag的id值
+ * row:当前行数据
+ *
  *
  * */
-const closeTag = async (tagId: number, userId: number) => {
-  console.log(tagId);
-  console.log(userId);
-  // 记录行id
-  tagInput.userId = userId;
-  let tag: IUser[] = tableData.value.filter(item => item.id === userId);
-  console.log('tag-test', tag);
-  tagList.value = tag[0].tags!;
-  tagList.value.some((val, index) => {
-    if (val.id === tagId) {
-      tagList.value.splice(index, 1);
+const closeTag = async (curId: number, row: IUser) => {
+  console.log("curId", curId);
+  let tagArray: ILabel[] = [];
+  // 最新tag数组 tagArray;示例：{id：'',tags:''}
+  tagArray = row.tags?.filter(item => item.id !== curId)!;
+  // 更新当前行id:row.id 下的tags节点数组
+  table.value = _.cloneDeep(tableData.value);
+  table.value.some((item) => {
+    if (item.id === row.id) {
+      item.tags = tagArray;
       return true;
     }
-  })
-
-
-  const res = await delTagAPI({userId, tagId});
+  });
+  const res = await delTagAPI(row.id!, curId);
   console.log(res.data);
   if (res.data.code === 200) {
-    // 1.提示信息
-    ElMessage({
-      showClose: true,
-      type: 'success',
-      message: '成功删除一个标签'
-    });
-    // 2.重新请求列表
+    // 重新请求列表
     await getPageList();
-  } else {
-    ElMessage({
-      showClose: true,
-      type: 'error',
-      message: '删除一个标签失败'
-    });
   }
-
 }
 /**
- * @name:watchEffect
- * @description:
+ * @desc:clearForm()方法
+ * 清空表单方法
  *
  * */
-watchEffect(() => {
-  table.value = _.cloneDeep(tableData.value);
-
-})
-
+const clearForm = () => {
+  form = reactive({...form, ...resetForm});
+}
 
 </script>
 
