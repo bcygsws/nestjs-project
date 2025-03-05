@@ -1,0 +1,6 @@
+db:
+  mysql1:
+    port: 3306
+
+  mysql2:
+    port: 3306

@@ -47,6 +47,22 @@ bootstrap();
  * 当.env.development和.env.production文件配置项，有和.env重名时，则覆盖.env中的配置
  * 这样就达到了预期
  *
+ * 2.4 对于以上2.3 配置，如果使用yml文件，而不是.env文件？如何实施？
+ * 2.4.1 安装包
+ * npm i config js-yaml @types/js-yaml --save
+ *
+ * 2.4.2 在根目录下，新建config目录，新建config.yaml文件，config.development.yaml和config.production.yaml
+ *
+ * 2.4.3 在src/configuration.ts文件，文件系统读取yaml文件内容，并返回键值对的形式
+ *
+ * 2.5 【强大的】config库
+ * config库，能够读取根目录下json文件，并合并他们
+ * config/config.json
+ * config/development.json
+ * config/production.json
+ *
+ * 【重点-扩展】node-config库
+ *
  *
  *
  *

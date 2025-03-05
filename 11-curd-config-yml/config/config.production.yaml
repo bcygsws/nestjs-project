@@ -1,0 +1,8 @@
+# 公共配置置于config.yaml文件中
+db:
+  mysql1:
+    username: root
+    password: example_prod
+
+  mysql2:
+    username: root2
