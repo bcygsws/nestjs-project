@@ -1,0 +1,14 @@
+#{
+#  "token": "your-token-secret",
+#  "port": 3000,
+#  "host":"localhost",
+#  "db": {
+#    "port": 27017,
+#    "username": "root",
+#    "password": "example"
+#  }
+#}
+
+token："your-token-secret"
+port：3000 
+host："localhost"
