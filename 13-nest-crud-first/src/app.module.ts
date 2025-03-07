@@ -1,14 +1,13 @@
 import {Module} from '@nestjs/common';
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
-import {UserModule} from './user/user.module';
 import {TypeOrmModule, TypeOrmModuleAsyncOptions} from "@nestjs/typeorm";
-import {TagModule} from './tag/tag.module';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {EnvModule} from './env/env.module';
 import * as dotenv from 'dotenv';
 import * as Joi from 'joi';
 import {ConfigEnum} from "./enum/env.enum";
+import {UserModule} from './user/user.module';
 
 // 读到值process.env.NODE_ENV,就使用这个环境；读不到默认是development
 // 注1：envFilePath根据读取的环境变量，来切换是开发环境，还是生产环境的配置文件；但仍然和.env没有关系;安装dotenv来解决
@@ -31,7 +30,7 @@ const envFilePath = `.env.${process.env.NODE_ENV || 'development'}`;
                     // entities: [__dirname + '/**/*.entity{.ts,.js}'],// 开发环境下可以注释掉，使用同步方式导入实体
                     synchronize: configService.get(ConfigEnum.DB_SYNC),
                     // logging: true,
-                    retryDelay: 500,
+                    retryDelay: 5000,
                     retryAttempts: 10,
                     autoLoadEntities: true
                 }
@@ -53,23 +52,23 @@ const envFilePath = `.env.${process.env.NODE_ENV || 'development'}`;
         //     retryAttempts: 10,
         //     autoLoadEntities: true,
         // }),
-        TagModule,
         ConfigModule.forRoot({
             isGlobal: true,
-            cache: true,// process.env会保存在内存中，提高性能
+            // cache: true,// process.env会保存在内存中，提高性能
+            load: [() => dotenv.config({path: '.env'})], // 注2：安装dotenv，加载.env文件，成为开发、生产环境的共享配置
             envFilePath,
             validationSchema: Joi.object({
                 DB_TYPE: Joi.string().valid('mariadb', 'mysql').default('mysql'),// 源码：MysqlConnectionOptions.d.ts查看mariadb
                 DB_USERNAME: Joi.string().required(),
                 DB_PASSWORD: Joi.string().required(),
                 DATABASE: Joi.string().required(),
-                DB_HOST: Joi.string().ip(),
+                // DB_HOST: Joi.string().ip(),
+                DB_HOST: Joi.alternatives().try(Joi.string().ip(), Joi.string().domain()),
                 // DB_PORT: Joi.number().valid(3306, 3307)
-                DB_PORT: Joi.number().default(3306), // default()设置默认值，valid()设置可选值
+                DB_PORT: Joi.number().default(3307), // default()设置默认值，valid()设置可选值
                 // DB_URL: Joi.string().domain(),
                 NODE_ENV: Joi.string().valid('development', 'production').default('development')
             }),
-            load: [() => dotenv.config({path: '.env'})] // 注2：安装dotenv，加载.env文件，成为开发、生产环境的共享配置
 
         }),
         EnvModule,
