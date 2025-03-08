@@ -4,9 +4,11 @@ import {UserController} from './user.controller';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {User} from "./entities/user.entity";
 import {Profile} from "./entities/profile.entity";
+import {Role} from "./entities/role.entity";
+import {Log} from "./entities/log.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, Profile])],// 引入实体类
+    imports: [TypeOrmModule.forFeature([User, Profile, Role, Log])],// 引入实体类
     controllers: [UserController],
     providers: [UserService],
 })
